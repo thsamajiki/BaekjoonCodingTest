@@ -11,9 +11,10 @@ public class Main {
     static int[] dy = { 0, 1, 0, -1 };
     static int[][] graph;
     static boolean[][] visited;
-    static Map<Integer, Integer> map = new HashMap<>();
 
     private void DFS(int x, int y) {
+        houseCount++;
+
         for (int i = 0; i < 4; i++) {
             int nextX = x + dx[i];
             int nextY = y + dy[i];
@@ -21,11 +22,9 @@ public class Main {
             if (!visited[nextX][nextY] && graph[nextX][nextY] == 1) {
                 visited[nextX][nextY] = true;
                 graph[nextX][nextY] = totalCount;
-                houseCount++;
                 DFS(nextX, nextY);
             }
         }
-
     }
 
     public static void main(String[] args) throws IOException {
@@ -36,6 +35,7 @@ public class Main {
         n = Integer.parseInt(br.readLine());
         graph = new int[n][n];
         visited = new boolean[n][n];
+        List<Integer> list = new ArrayList<>();
 
         for (int i = 0; i < n; i++) {
             String temp = br.readLine();
@@ -48,12 +48,12 @@ public class Main {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (!visited[i][j] && graph[i][j] == 1) {
+                    houseCount = 0;
                     totalCount++;
-                    houseCount++;
                     visited[i][j] = true;
                     graph[i][j] = totalCount;
                     main.DFS(i, j);
-                    map.put(totalCount, houseCount);
+                    list.add(houseCount);
                 }
                 houseCount = 0;
             }
@@ -61,11 +61,9 @@ public class Main {
 
         System.out.println(totalCount);
 
-        List<Integer> counts = new ArrayList<>(map.values());
+        Collections.sort(list);
 
-        Collections.sort(counts);
-
-        for (int count : counts) {
+        for (int count : list) {
             System.out.println(count);
         }
     }
