@@ -3,21 +3,29 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
-    static int n, m, answer;
+    static int n, totalCount, houseCount;
+    static int[] dx = { -1, 0, 1, 0 };
+    static int[] dy = { 0, 1, 0, -1 };
     static int[][] graph;
-    static boolean[] visited;
+    static boolean[][] visited;
+    static Map<Integer, Integer> map = new HashMap<>();
 
-    private void DFS(int v) {
-        for (int i = 1; i <= n; i++) {
-            if (!visited[i] && graph[v][i] == 1) {
-                visited[i] = true;
-                DFS(i);
-                answer++;
+    private void DFS(int x, int y) {
+        for (int i = 0; i < 4; i++) {
+            int nextX = x + dx[i];
+            int nextY = y + dy[i];
+            if (nextX < 0 || nextX > n - 1 || nextY < 0 || nextY > n - 1 ) continue;
+            if (!visited[nextX][nextY] && graph[nextX][nextY] == 1) {
+                visited[nextX][nextY] = true;
+                graph[nextX][nextY] = totalCount;
+                houseCount++;
+                DFS(nextX, nextY);
             }
         }
+
     }
 
     public static void main(String[] args) throws IOException {
@@ -25,23 +33,40 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-
         n = Integer.parseInt(br.readLine());
-        m = Integer.parseInt(br.readLine());
-        graph = new int[n + 1][n + 1];
-        visited = new boolean[n + 1];
+        graph = new int[n][n];
+        visited = new boolean[n][n];
 
-        for (int i = 0; i < m; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int from = Integer.parseInt(st.nextToken());
-            int to = Integer.parseInt(st.nextToken());
-            graph[from][to] = 1;
-            graph[to][from] = 1;
+        for (int i = 0; i < n; i++) {
+            String temp = br.readLine();
+            for (int j = 0; j < n; j++) {
+                int num = Character.getNumericValue(temp.charAt(j));
+                graph[i][j] = num;
+            }
         }
 
-        visited[1] = true;
-        main.DFS(1);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (!visited[i][j] && graph[i][j] == 1) {
+                    totalCount++;
+                    houseCount++;
+                    visited[i][j] = true;
+                    graph[i][j] = totalCount;
+                    main.DFS(i, j);
+                    map.put(totalCount, houseCount);
+                }
+                houseCount = 0;
+            }
+        }
 
-        System.out.println(answer);
+        System.out.println(totalCount);
+
+        List<Integer> counts = new ArrayList<>(map.values());
+
+        Collections.sort(counts);
+
+        for (int count : counts) {
+            System.out.println(count);
+        }
     }
 }
