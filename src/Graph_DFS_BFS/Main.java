@@ -3,22 +3,23 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
 
 public class Main {
-    static int m, n, k;
+    static int n, normal, abnormal;
     static int[] dx = { -1, 0, 1, 0 };
     static int[] dy = { 0, 1, 0, -1 };
-    static int[][] map;
+    static char[][] map;
     static boolean[][] visited;
 
     private void DFS(int x, int y) {
+        char color = map[x][y];
+
         for (int i = 0; i < 4; i++) {
             int nextX = x + dx[i];
             int nextY = y + dy[i];
 
-            if (nextX < 0 || nextX > n - 1 || nextY < 0 || nextY > m - 1) continue;
-            if (map[nextX][nextY] == 1 && !visited[nextX][nextY]) {
+            if (nextX < 0 || nextX > n - 1 || nextY < 0 || nextY > n - 1) continue;
+            if (map[nextX][nextY] == color && !visited[nextX][nextY]) {
                 visited[nextX][nextY] = true;
                 DFS(nextX, nextY);
             }
@@ -30,36 +31,51 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int t = Integer.parseInt(br.readLine());
+        n = Integer.parseInt(br.readLine());
 
-        for (int tc = 0; tc < t; tc++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            m = Integer.parseInt(st.nextToken());
-            n = Integer.parseInt(st.nextToken());
-            k = Integer.parseInt(st.nextToken());
+        map = new char[n][n];
+        visited = new boolean[n][n];
 
-            map = new int[n][m];
-            visited = new boolean[n][m];
-
-            for (int i = 0; i < k; i++) {
-                st = new StringTokenizer(br.readLine());
-                int y = Integer.parseInt(st.nextToken());
-                int x = Integer.parseInt(st.nextToken());
-                map[x][y] = 1;
+        for (int i = 0; i < n; i++) {
+            String temp = br.readLine();
+            for (int j = 0; j < n; j++) {
+                char ch = temp.charAt(j);
+                map[i][j] = ch;
             }
+        }
 
-            int answer = 0;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    if (map[i][j] == 1 && !visited[i][j]) {
-                        visited[i][j] = true;
-                        answer++;
-                        main.DFS(i, j);
-                    }
+        // 정상인
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (!visited[i][j]) {
+                    normal++;
+                    visited[i][j] = true;
+                    main.DFS(i, j);
                 }
             }
-
-            System.out.println(answer);
         }
+
+        // 적록색약
+        visited = new boolean[n][n];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (map[i][j] == 'G') {
+                    map[i][j] = 'R';
+                }
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (!visited[i][j]) {
+                    abnormal++;
+                    visited[i][j] = true;
+                    main.DFS(i, j);
+                }
+            }
+        }
+
+        System.out.println(normal + " " + abnormal);
     }
 }
