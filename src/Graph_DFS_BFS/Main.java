@@ -6,22 +6,20 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static int n, totalCount, houseCount;
+    static int m, n, k;
     static int[] dx = { -1, 0, 1, 0 };
     static int[] dy = { 0, 1, 0, -1 };
-    static int[][] graph;
+    static int[][] map;
     static boolean[][] visited;
 
     private void DFS(int x, int y) {
-        houseCount++;
-
         for (int i = 0; i < 4; i++) {
             int nextX = x + dx[i];
             int nextY = y + dy[i];
-            if (nextX < 0 || nextX > n - 1 || nextY < 0 || nextY > n - 1 ) continue;
-            if (!visited[nextX][nextY] && graph[nextX][nextY] == 1) {
+
+            if (nextX < 0 || nextX > n - 1 || nextY < 0 || nextY > m - 1) continue;
+            if (map[nextX][nextY] == 1 && !visited[nextX][nextY]) {
                 visited[nextX][nextY] = true;
-                graph[nextX][nextY] = totalCount;
                 DFS(nextX, nextY);
             }
         }
@@ -32,39 +30,36 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        n = Integer.parseInt(br.readLine());
-        graph = new int[n][n];
-        visited = new boolean[n][n];
-        List<Integer> list = new ArrayList<>();
+        int t = Integer.parseInt(br.readLine());
 
-        for (int i = 0; i < n; i++) {
-            String temp = br.readLine();
-            for (int j = 0; j < n; j++) {
-                int num = Character.getNumericValue(temp.charAt(j));
-                graph[i][j] = num;
+        for (int tc = 0; tc < t; tc++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            m = Integer.parseInt(st.nextToken());
+            n = Integer.parseInt(st.nextToken());
+            k = Integer.parseInt(st.nextToken());
+
+            map = new int[n][m];
+            visited = new boolean[n][m];
+
+            for (int i = 0; i < k; i++) {
+                st = new StringTokenizer(br.readLine());
+                int y = Integer.parseInt(st.nextToken());
+                int x = Integer.parseInt(st.nextToken());
+                map[x][y] = 1;
             }
-        }
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (!visited[i][j] && graph[i][j] == 1) {
-                    houseCount = 0;
-                    totalCount++;
-                    visited[i][j] = true;
-                    graph[i][j] = totalCount;
-                    main.DFS(i, j);
-                    list.add(houseCount);
+            int answer = 0;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    if (map[i][j] == 1 && !visited[i][j]) {
+                        visited[i][j] = true;
+                        answer++;
+                        main.DFS(i, j);
+                    }
                 }
-                houseCount = 0;
             }
-        }
 
-        System.out.println(totalCount);
-
-        Collections.sort(list);
-
-        for (int count : list) {
-            System.out.println(count);
+            System.out.println(answer);
         }
     }
 }
