@@ -3,25 +3,29 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int n, normal, abnormal;
+    static int r, c, answer = 1;
     static int[] dx = { -1, 0, 1, 0 };
     static int[] dy = { 0, 1, 0, -1 };
     static char[][] map;
-    static boolean[][] visited;
+    static Map<Character, Boolean> lettersChecked;
 
-    private void DFS(int x, int y) {
-        char color = map[x][y];
-
+    private void DFS(int x, int y, int count) {
         for (int i = 0; i < 4; i++) {
             int nextX = x + dx[i];
             int nextY = y + dy[i];
 
-            if (nextX < 0 || nextX > n - 1 || nextY < 0 || nextY > n - 1) continue;
-            if (map[nextX][nextY] == color && !visited[nextX][nextY]) {
-                visited[nextX][nextY] = true;
-                DFS(nextX, nextY);
+            if (nextX < 0 || nextX >= r || nextY < 0 || nextY >= c) continue;
+            if (!lettersChecked.get(map[nextX][nextY])) {
+                lettersChecked.put(map[nextX][nextY], true);
+                DFS(nextX, nextY, count + 1);
+                lettersChecked.put(map[nextX][nextY], false);
+            } else {
+                answer = Math.max(answer, count);
             }
         }
     }
@@ -30,52 +34,29 @@ public class Main {
         Main main = new Main();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        r = Integer.parseInt(st.nextToken());
+        c = Integer.parseInt(st.nextToken());
 
-        n = Integer.parseInt(br.readLine());
+        map = new char[r][c];
+        lettersChecked = new HashMap<>();
 
-        map = new char[n][n];
-        visited = new boolean[n][n];
-
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < r; i++) {
             String temp = br.readLine();
-            for (int j = 0; j < n; j++) {
-                char ch = temp.charAt(j);
-                map[i][j] = ch;
+            for (int j = 0; j < c; j++) {
+                map[i][j] = temp.charAt(j);
             }
         }
 
-        // 정상인
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (!visited[i][j]) {
-                    normal++;
-                    visited[i][j] = true;
-                    main.DFS(i, j);
-                }
-            }
+        for (char ch = 'A'; ch <= 'Z'; ch++) {
+            lettersChecked.put(ch, false);
         }
 
-        // 적록색약
-        visited = new boolean[n][n];
+        char firstLetter = map[0][0];
+        lettersChecked.put(firstLetter, true);
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (map[i][j] == 'G') {
-                    map[i][j] = 'R';
-                }
-            }
-        }
+        main.DFS(0, 0, 1);
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (!visited[i][j]) {
-                    abnormal++;
-                    visited[i][j] = true;
-                    main.DFS(i, j);
-                }
-            }
-        }
-
-        System.out.println(normal + " " + abnormal);
+        System.out.println(answer);
     }
 }
