@@ -6,20 +6,20 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int w, h, answer;
+    static int n, maxHeight, count, answer;
     static int[][] map;
     static boolean[][] visited;
-    static int[] dx = { -1, -1, 0, 1, 1, 1, 0, -1 };
-    static int[] dy = { 0, 1, 1, 1, 0, -1, -1, -1 };
+    static int[] dx = { -1, 0, 1, 0 };
+    static int[] dy = { 0, 1, 0, -1 };
 
     private void DFS(int x, int y) {
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 4; i++) {
             int nextX = x + dx[i];
             int nextY = y + dy[i];
 
-            if (nextX < 0 || nextX >= h || nextY < 0 || nextY >= w) continue;
+            if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= n) continue;
 
-            if (map[nextX][nextY] == 1 && !visited[nextX][nextY]) {
+            if (!visited[nextX][nextY] && map[nextX][nextY] > 0) {
                 visited[nextX][nextY] = true;
                 DFS(nextX, nextY);
             }
@@ -30,33 +30,48 @@ public class Main {
         Main main = new Main();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        while ((w = Integer.parseInt(st.nextToken())) > 0 && (h = Integer.parseInt(st.nextToken())) > 0) {
-            map = new int[h][w];
-            visited = new boolean[h][w];
-            answer = 0;
+        n = Integer.parseInt(br.readLine());
 
-            for (int i = 0; i < h; i++) {
-                st = new StringTokenizer(br.readLine());
-                for (int j = 0; j < w; j++) {
-                    map[i][j] = Integer.parseInt(st.nextToken());
+        map = new int[n][n];
+
+        for (int i = 0; i < n; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < n; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
+
+        int[][] originalMap = map;
+
+        while (maxHeight <= 100) {
+            visited = new boolean[n][n];
+            count = 0;
+            map = originalMap;
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (map[i][j] <= maxHeight) {
+                        map[i][j] = 0;
+                    }
                 }
             }
 
-            for (int i = 0; i < h; i++) {
-                for (int j = 0; j < w; j++) {
-                    if (map[i][j] == 1 && !visited[i][j]) {
-                        answer++;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (map[i][j] > 0 && !visited[i][j]) {
                         visited[i][j] = true;
+                        count++;
                         main.DFS(i, j);
                     }
                 }
             }
 
-            System.out.println(answer);
+            answer = Math.max(answer, count);
 
-            st = new StringTokenizer(br.readLine());
+            maxHeight++;
         }
+
+        System.out.println(answer);
     }
 }
