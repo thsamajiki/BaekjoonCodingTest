@@ -3,25 +3,22 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int n, maxHeight, count, answer;
-    static int[][] map;
-    static boolean[][] visited;
-    static int[] dx = { -1, 0, 1, 0 };
-    static int[] dy = { 0, 1, 0, -1 };
+    static int n;
+    static List<List<Integer>> graph;
+    static boolean[] visited;
+    static int[] parents;
 
-    private void DFS(int x, int y) {
-        for (int i = 0; i < 4; i++) {
-            int nextX = x + dx[i];
-            int nextY = y + dy[i];
-
-            if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= n) continue;
-
-            if (!visited[nextX][nextY] && map[nextX][nextY] > 0) {
-                visited[nextX][nextY] = true;
-                DFS(nextX, nextY);
+    private void DFS(int node) {
+        for (int x : graph.get(node)) {
+            if (!visited[x]) {
+                visited[x] = true;
+                DFS(x);
+                parents[x] = node;
             }
         }
     }
@@ -33,45 +30,28 @@ public class Main {
 
         n = Integer.parseInt(br.readLine());
 
-        map = new int[n][n];
+        graph = new ArrayList<>();
+        visited = new boolean[n + 1];
+        parents = new int[n + 1];
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i <= n; i++) {
+            graph.add(new ArrayList<>());
+        }
+
+        for (int i = 0; i < n - 1; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < n; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-            }
+            int from = Integer.parseInt(st.nextToken());
+            int to = Integer.parseInt(st.nextToken());
+
+            graph.get(from).add(to);
+            graph.get(to).add(from);
         }
 
-        int[][] originalMap = map;
+        visited[1] = true;
+        main.DFS(1);
 
-        while (maxHeight <= 100) {
-            visited = new boolean[n][n];
-            count = 0;
-            map = originalMap;
-
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (map[i][j] <= maxHeight) {
-                        map[i][j] = 0;
-                    }
-                }
-            }
-
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (map[i][j] > 0 && !visited[i][j]) {
-                        visited[i][j] = true;
-                        count++;
-                        main.DFS(i, j);
-                    }
-                }
-            }
-
-            answer = Math.max(answer, count);
-
-            maxHeight++;
+        for (int i = 2; i < parents.length; i++) {
+            System.out.println(parents[i]);
         }
-
-        System.out.println(answer);
     }
 }
