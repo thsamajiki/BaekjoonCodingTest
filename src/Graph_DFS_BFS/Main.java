@@ -3,55 +3,104 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int n;
-    static List<List<Integer>> graph;
-    static boolean[] visited;
-    static int[] parents;
+    static int n, m, max;
+    static int[] dx = { -1, 0, 1, 0 };
+    static int[] dy = { 0, 1, 0, -1 };
+    static int[][] originalMap;
+    static boolean[][] visited;
 
-    private void DFS(int node) {
-        for (int x : graph.get(node)) {
-            if (!visited[x]) {
-                visited[x] = true;
-                DFS(x);
-                parents[x] = node;
+    private void makeWall(int wallCount) {
+        if (wallCount == 3) {
+            // copyMap을 만드는 이유
+            // 벽이 3개 세워질 때마다 spreadVirus를 실행해야 하므로
+            // 벽이 세워진 originalMap을 복사해서 써야 함
+            int[][] copyMap = new int[n][m];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    copyMap[i][j] = originalMap[i][j];
+                }
+            }
+
+            max = Math.max(max, spreadVirus(copyMap));
+            return;
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (originalMap[i][j] == 0 && !visited[i][j]) {
+                    originalMap[i][j] = 1;
+                    visited[i][j] = true;
+                    makeWall(wallCount + 1);
+                    originalMap[i][j] = 0;
+                    visited[i][j] = false;
+                }
             }
         }
+    }
+
+    private int spreadVirus(int[][] area) {
+        Queue<int[]> q = new LinkedList<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (area[i][j] == 2) {
+                    q.offer(new int[] { i, j });
+                }
+            }
+        }
+
+        while (!q.isEmpty()) {
+            int[] now = q.poll();
+            int nowX = now[0];
+            int nowY = now[1];
+
+            for (int i = 0; i < 4; i++) {
+                int nextX = nowX + dx[i];
+                int nextY = nowY + dy[i];
+
+                if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= m) continue;
+                if (area[nextX][nextY] != 0) continue;
+
+                q.offer(new int[] { nextX, nextY });
+                area[nextX][nextY] = 2;
+            }
+        }
+
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (area[i][j] == 0) count++;
+            }
+        }
+
+        return count;
     }
 
     public static void main(String[] args) throws IOException {
         Main main = new Main();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
 
-        n = Integer.parseInt(br.readLine());
+        originalMap = new int[n][m];
+        visited = new boolean[n][m];
 
-        graph = new ArrayList<>();
-        visited = new boolean[n + 1];
-        parents = new int[n + 1];
-
-        for (int i = 0; i <= n; i++) {
-            graph.add(new ArrayList<>());
+        for (int i = 0; i < n; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < m; j++) {
+                originalMap[i][j] = Integer.parseInt(st.nextToken());
+            }
         }
 
-        for (int i = 0; i < n - 1; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int from = Integer.parseInt(st.nextToken());
-            int to = Integer.parseInt(st.nextToken());
+        main.makeWall(0);
 
-            graph.get(from).add(to);
-            graph.get(to).add(from);
-        }
-
-        visited[1] = true;
-        main.DFS(1);
-
-        for (int i = 2; i < parents.length; i++) {
-            System.out.println(parents[i]);
-        }
+        System.out.println(max);
     }
 }
