@@ -8,77 +8,37 @@ import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int n, m, max;
-    static int[] dx = { -1, 0, 1, 0 };
-    static int[] dy = { 0, 1, 0, -1 };
-    static int[][] originalMap;
-    static boolean[][] visited;
+    static int m, n, h, answer;
+    static int[] dx = { -1, 0, 1, 0, 0, 0 };
+    static int[] dy = { 0, 1, 0, -1, 0, 0 };
+    static int[] dz = { 0, 0, 0, 0, 1, -1 };
+    static int[][][] map, dis;
+    static boolean[][][] visited;
+    static Queue<int[]> q = new LinkedList<>();
 
-    private void makeWall(int wallCount) {
-        if (wallCount == 3) {
-            // copyMap을 만드는 이유
-            // 벽이 3개 세워질 때마다 spreadVirus를 실행해야 하므로
-            // 벽이 세워진 originalMap을 복사해서 써야 함
-            int[][] copyMap = new int[n][m];
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    copyMap[i][j] = originalMap[i][j];
-                }
-            }
-
-            max = Math.max(max, spreadVirus(copyMap));
-            return;
-        }
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (originalMap[i][j] == 0 && !visited[i][j]) {
-                    originalMap[i][j] = 1;
-                    visited[i][j] = true;
-                    makeWall(wallCount + 1);
-                    originalMap[i][j] = 0;
-                    visited[i][j] = false;
-                }
-            }
-        }
-    }
-
-    private int spreadVirus(int[][] area) {
-        Queue<int[]> q = new LinkedList<>();
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (area[i][j] == 2) {
-                    q.offer(new int[] { i, j });
-                }
-            }
-        }
-
+    private void BFS() {
         while (!q.isEmpty()) {
             int[] now = q.poll();
-            int nowX = now[0];
-            int nowY = now[1];
+            int nowX = now[1];
+            int nowY = now[2];
+            int nowZ = now[0];
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 6; i++) {
                 int nextX = nowX + dx[i];
                 int nextY = nowY + dy[i];
+                int nextZ = nowZ + dz[i];
 
-                if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= m) continue;
-                if (area[nextX][nextY] != 0) continue;
+                if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= m || nextZ < 0 || nextZ >= h) continue;
+                if (map[nextZ][nextX][nextY] == -1) continue;
+                if (!visited[nextZ][nextX][nextY] && map[nextZ][nextX][nextY] == 0) {
+                    visited[nextZ][nextX][nextY] = true;
+                    map[nextZ][nextX][nextY] = 1;
+                    dis[nextZ][nextX][nextY] = dis[nowZ][nowX][nowY] + 1;
 
-                q.offer(new int[] { nextX, nextY });
-                area[nextX][nextY] = 2;
+                    q.offer(new int[] { nextZ, nextX, nextY });
+                }
             }
         }
-
-        int count = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (area[i][j] == 0) count++;
-            }
-        }
-
-        return count;
     }
 
     public static void main(String[] args) throws IOException {
@@ -86,21 +46,72 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
+
         m = Integer.parseInt(st.nextToken());
+        n = Integer.parseInt(st.nextToken());
+        h = Integer.parseInt(st.nextToken());
 
-        originalMap = new int[n][m];
-        visited = new boolean[n][m];
+        map = new int[h][n][m];
+        dis = new int[h][n][m];
+        visited = new boolean[h][n][m];
 
-        for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < m; j++) {
-                originalMap[i][j] = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < n; j++) {
+                st = new StringTokenizer(br.readLine());
+                for (int k = 0; k < m; k++) {
+                    map[i][j][k] = Integer.parseInt(st.nextToken());
+                }
             }
         }
 
-        main.makeWall(0);
+        outer:
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < m; k++) {
+                    if (map[i][j][k] == 0) {
+                        break outer;
+                    }
+                }
+            }
+        }
 
-        System.out.println(max);
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < m; k++) {
+                    if (!visited[i][j][k] && map[i][j][k] == 1) {
+                        visited[i][j][k] = true;
+                        q.offer(new int[] { i, j, k });
+                    }
+                }
+            }
+        }
+
+        main.BFS();
+
+        boolean flag = true;
+        outer:
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < m; k++) {
+                    if (map[i][j][k] == 0) {
+                        flag = false;
+                        break outer;
+                    }
+                }
+            }
+        }
+
+        if (flag) {
+            for (int i = 0; i < h; i++) {
+                for (int j = 0; j < n; j++) {
+                    for (int k = 0; k < m; k++) {
+                        answer = Math.max(answer, dis[i][j][k]);
+                    }
+                }
+            }
+            System.out.println(answer);
+        } else {
+            System.out.println(-1);
+        }
     }
 }
