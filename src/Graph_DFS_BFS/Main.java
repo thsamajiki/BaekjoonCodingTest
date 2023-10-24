@@ -3,31 +3,32 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public class Main {
-    private String solution(String str) {
-        String answer;
-        Stack<Character> stack = new Stack<>();
 
-        for (char ch : str.toCharArray()) {
-            if (ch == ')') {
-                if (stack.isEmpty()) {
-                    stack.push(ch);
-                    answer = "NO";
-                    return answer;
-                } else {
-                    stack.pop(); // 여는 괄호 제거
-                }
-            } else {
-                stack.push(ch);
+    static List<Character> list = new ArrayList<>();
+
+    private String solution(int[] arr, int n) {
+        String answer = "NO";
+        Stack<Integer> stack = new Stack<>();
+
+        int index = 1;
+
+        for (int i = 1; i <= n; i++) {
+            stack.push(i);
+            list.add('+');
+            while (!stack.isEmpty() && stack.peek() == arr[index]) {
+                stack.pop();
+                list.add('-');
+                index++;
             }
         }
 
         if (stack.isEmpty()) {
             answer = "YES";
-        } else {
-            answer = "NO";
         }
 
         return answer;
@@ -38,12 +39,21 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int t = Integer.parseInt(br.readLine());
+        int n = Integer.parseInt(br.readLine());
+        int[] numbers = new int[n + 1];
 
-        for (int td = 0; td < t; td++) {
-            String testData = br.readLine();
+        for (int i = 1; i <= n; i++) {
+            numbers[i] = Integer.parseInt(br.readLine());
+        }
 
-            System.out.println(main.solution(testData));
+        String str = main.solution(numbers, n);
+
+        if (str.equals("NO")) {
+            System.out.println(str);
+        } else {
+            for (char ch : list) {
+                System.out.println(ch);
+            }
         }
     }
 }
