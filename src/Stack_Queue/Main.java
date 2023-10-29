@@ -7,7 +7,6 @@ import java.util.Stack;
 
 public class Main {
     public String solution(String str, String[] commands) {
-        String answer = "";
         Stack<Character> originalStack = new Stack<>(); // 기준, peek 지점이 바로 현재 커서의 위치
         Stack<Character> tempStack = new Stack<>(); // 커서 뒤의 원소들을 tempStack으로 이동시켜둔다.
 
@@ -50,11 +49,13 @@ public class Main {
             originalStack.push(tempStack.pop());
         }
 
+        StringBuilder sb = new StringBuilder();
+
         for (char x : originalStack) {
-            answer += x;
+            sb.append(x);
         }
 
-        return answer;
+        return sb.toString();
     }
     public static void main(String[] args) throws IOException {
         Main main = new Main();
