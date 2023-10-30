@@ -9,8 +9,7 @@ class MainTest {
     @Test
     void solution() {
         Main main = new Main();
-        assertEquals("abcdyx", main.solution("abcd", new String[] { "P x", "L", "P y" }));
-        assertEquals("yxabc", main.solution("abc", new String[] { "L", "L", "L", "L", "L", "P x", "L", "B", "P y" }));
-        assertEquals("yxz", main.solution("dmih", new String[] { "B", "B", "P x", "L", "B", "B", "B", "P y", "D", "D", "P z" }));
+        assertArrayEquals(new int[] { 5, 7, 7, -1 }, main.solution(3, new int[] { 3, 5, 2, 7 }));
+        assertArrayEquals(new int[] { -1, 8, 8, -1 }, main.solution(3, new int[] { 9, 5, 4, 8 }));
     }
 }
