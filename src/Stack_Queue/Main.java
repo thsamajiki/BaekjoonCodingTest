@@ -4,74 +4,56 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Stack;
+import java.util.StringTokenizer;
 
 public class Main {
-    public String solution(String str, String[] commands) {
-        Stack<Character> originalStack = new Stack<>(); // 기준, peek 지점이 바로 현재 커서의 위치
-        Stack<Character> tempStack = new Stack<>(); // 커서 뒤의 원소들을 tempStack으로 이동시켜둔다.
+    public int[] solution(int N, int[] arr) {
+        int[] answer = new int[N + 1];
+        Stack<Integer> stack = new Stack<>();
 
-        int N = str.length();
-        int M = commands.length;
-
-        for (int i = 0; i < N; i++) {
-            originalStack.push(str.charAt(i));
-        }
-
-        for (int i = 0; i < M; i++) {
-            if (commands[i].length() >= 2) {
-                commands[i] = commands[i].replace(" ", "");
+        for (int i = 1; i <= N; i++) {
+            /*
+             * 스택이 비어 있지 않으면서
+             * 현재 원소가 스택의 맨 위 원소가 가리키는 원소보다 큰 경우
+             * 해당 조건을 만족할 때 까지 stack의 원소를 pop하면서
+             * 해당 인덱스의 값을 현재 원소로 바꿔준다.
+             */
+            while (!stack.isEmpty() && arr[stack.peek()] < arr[i]) {
+                arr[stack.pop()] = arr[i];
             }
-            char[] command = commands[i].toCharArray();
 
-            switch (command[0]) {
-                case 'L': // 커서를 왼쪽으로 옮겨야 하기 때문에 커서 뒤에 존재하는 원소들을 tempStack으로 옮긴다.
-                    if (!originalStack.isEmpty()) {
-                        tempStack.push(originalStack.pop());
-                    }
-                    break;
-                case 'D': // 커서를 오른쪽으로 옮겨야 하기 때문에 tempStack에 존재하는 원소들을 originalStack으로 옮긴다.
-                    if (!tempStack.isEmpty()) {
-                        originalStack.push(tempStack.pop());
-                    }
-                    break;
-                case 'B':
-                    if (!originalStack.isEmpty()) {
-                        originalStack.pop();
-                    }
-                    break;
-                case 'P':
-                    originalStack.push(command[1]);
-                    break;
-            }
+            stack.push(i);
         }
 
-        while (!tempStack.isEmpty()) {
-            originalStack.push(tempStack.pop());
+        while (!stack.isEmpty()) {
+            arr[stack.pop()] = -1;
         }
 
-        StringBuilder sb = new StringBuilder();
+        answer = arr;
 
-        for (char x : originalStack) {
-            sb.append(x);
-        }
-
-        return sb.toString();
+        return answer;
     }
+
     public static void main(String[] args) throws IOException {
         Main main = new Main();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String str = br.readLine();
+        int N = Integer.parseInt(br.readLine());
 
-        int M = Integer.parseInt(br.readLine());
+        int[] arr = new int[N + 1];
 
-        String[] commands = new String[M];
-
-        for (int i = 0; i < M; i++) {
-            commands[i] = br.readLine();
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        for (int i = 1; i <= N; i++) {
+            arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        System.out.println(main.solution(str, commands));
+        int[] answer = main.solution(N, arr);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= N; i++) {
+            sb.append(answer[i]).append(" ");
+        }
+        System.out.println(sb);
     }
 }
