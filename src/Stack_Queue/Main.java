@@ -6,32 +6,37 @@ import java.io.InputStreamReader;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
-public class Main {
-    public int[] solution(int N, int[] arr) {
-        int[] answer = new int[N + 1];
-        Stack<Integer> stack = new Stack<>();
+class Top {
+    int height;
+    int index;
 
-        for (int i = 1; i <= N; i++) {
-            /*
-             * 스택이 비어 있지 않으면서
-             * 현재 원소가 스택의 맨 위 원소가 가리키는 원소보다 큰 경우
-             * 해당 조건을 만족할 때 까지 stack의 원소를 pop하면서
-             * 해당 인덱스의 값을 현재 원소로 바꿔준다.
-             */
-            while (!stack.isEmpty() && arr[stack.peek()] < arr[i]) {
-                arr[stack.pop()] = arr[i];
+    public Top(int height, int index) {
+        this.height = height;
+        this.index = index;
+    }
+}
+
+public class Main {
+    public String solution(int n, int[] arr) {
+        Stack<Top> stack = new Stack<>();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < n; i++) {
+            while (!stack.isEmpty() && stack.peek().height < arr[i]) {
+                stack.pop(); // 탑이 신호를 보냈을 때, 받을 수 있는 탑이 나올 때까지 top을 pop한다
             }
 
-            stack.push(i);
+            if (stack.isEmpty()) {
+                sb.append("0").append(" "); // stack이 비었다면 금방 세워진 탑이 제일 높으므로 0을 출력
+            } else {
+                sb.append(stack.peek().index).append(" ");
+            }
+
+            stack.push(new Top(arr[i], i + 1));
         }
 
-        while (!stack.isEmpty()) {
-            arr[stack.pop()] = -1;
-        }
-
-        answer = arr;
-
-        return answer;
+        return sb.toString();
     }
 
     public static void main(String[] args) throws IOException {
@@ -41,19 +46,13 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-        int[] arr = new int[N + 1];
+        int[] arr = new int[N];
 
         StringTokenizer st = new StringTokenizer(br.readLine());
-        for (int i = 1; i <= N; i++) {
+        for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        int[] answer = main.solution(N, arr);
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 1; i <= N; i++) {
-            sb.append(answer[i]).append(" ");
-        }
-        System.out.println(sb);
+        System.out.println(main.solution(N, arr));
     }
 }
