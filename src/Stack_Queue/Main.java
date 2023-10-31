@@ -4,36 +4,53 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Stack;
-import java.util.StringTokenizer;
-
-class Top {
-    int height;
-    int index;
-
-    public Top(int height, int index) {
-        this.height = height;
-        this.index = index;
-    }
-}
 
 public class Main {
-    public String solution(int n, int[] arr) {
-        Stack<Top> stack = new Stack<>();
+    public String solution(String str, String bomb) {
+        Stack<Character> stack = new Stack<>();
 
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < n; i++) {
-            while (!stack.isEmpty() && stack.peek().height < arr[i]) {
-                stack.pop(); // 탑이 신호를 보냈을 때, 받을 수 있는 탑이 나올 때까지 top을 pop한다
-            }
+        int strLength = str.length();
+        int bombLength = bomb.length();
 
-            if (stack.isEmpty()) {
-                sb.append("0").append(" "); // stack이 비었다면 금방 세워진 탑이 제일 높으므로 0을 출력
-            } else {
-                sb.append(stack.peek().index).append(" ");
-            }
 
-            stack.push(new Top(arr[i], i + 1));
+        for (int i = 0; i < strLength; i++) {
+            stack.push(str.charAt(i));
+
+            if (stack.size() >= bombLength) {
+                boolean isSame = true;
+
+                System.out.println("stack : " + stack);
+                System.out.println("stack.size() : " + stack.size());
+                System.out.println("bombLength : " + bombLength);
+
+                for (int j = 0; j < bombLength; j++) {
+                    System.out.println("stack의 크기 (= " + stack.size() + ") - bombLength (= " + bombLength + ") + j(= " + j + ") : " + stack.get(stack.size() - bombLength + j));
+                    System.out.println("bomb.charAt(" + j + ") : " + bomb.charAt(j));
+                    System.out.println(stack.get(stack.size() - bombLength + j) != bomb.charAt(j));
+                    if (stack.get(stack.size() - bombLength + j) != bomb.charAt(j)) {
+                        isSame = false;
+                        System.out.println("isSame : " + isSame);
+                        break;
+                    }
+                }
+
+                if (isSame) {
+                    System.out.println("isSame이 true일 때 진입");
+                    for (int j = 0; j < bombLength; j++) {
+                        stack.pop();
+                    }
+                }
+            }
+        }
+
+        for (char ch : stack) {
+            sb.append(ch);
+        }
+
+        if (sb.length() == 0) {
+            sb.append("FRULA");
         }
 
         return sb.toString();
@@ -44,15 +61,9 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        String str = br.readLine();
+        String bomb = br.readLine();
 
-        int[] arr = new int[N];
-
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < N; i++) {
-            arr[i] = Integer.parseInt(st.nextToken());
-        }
-
-        System.out.println(main.solution(N, arr));
+        System.out.println(main.solution(str, bomb));
     }
 }
