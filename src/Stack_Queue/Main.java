@@ -18,15 +18,19 @@ public class Main {
         for (int i = 0; i < strLength; i++) {
             stack.push(str.charAt(i));
 
+            System.out.println("새로운 단계 : " + i);
+
             if (stack.size() >= bombLength) {
                 boolean isSame = true;
 
                 System.out.println("stack : " + stack);
                 System.out.println("stack.size() : " + stack.size());
                 System.out.println("bombLength : " + bombLength);
+                System.out.println("==============================");
 
                 for (int j = 0; j < bombLength; j++) {
-                    System.out.println("stack의 크기 (= " + stack.size() + ") - bombLength (= " + bombLength + ") + j(= " + j + ") : " + stack.get(stack.size() - bombLength + j));
+                    System.out.println("for문 진입");
+                    System.out.println("stack의 크기 (= " + stack.size() + ") - bombLength (= " + bombLength + ") + j(= " + j + ") => " + stack.get(stack.size() - bombLength + j));
                     System.out.println("bomb.charAt(" + j + ") : " + bomb.charAt(j));
                     System.out.println(stack.get(stack.size() - bombLength + j) != bomb.charAt(j));
                     if (stack.get(stack.size() - bombLength + j) != bomb.charAt(j)) {
@@ -34,6 +38,7 @@ public class Main {
                         System.out.println("isSame : " + isSame);
                         break;
                     }
+                    System.out.println("for문의 " + j + "차 끝나고 다시 반복!\n");
                 }
 
                 if (isSame) {
@@ -42,6 +47,8 @@ public class Main {
                         stack.pop();
                     }
                 }
+
+                System.out.println("\n☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆");
             }
         }
 
