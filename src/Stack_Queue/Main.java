@@ -6,61 +6,65 @@ import java.io.InputStreamReader;
 import java.util.Stack;
 
 public class Main {
-    public String solution(String str, String bomb) {
+    public int solution(String str) {
+        int answer = 0;
+        int multiplier = 1;
         Stack<Character> stack = new Stack<>();
 
-        StringBuilder sb = new StringBuilder();
+        int length = str.length();
 
-        int strLength = str.length();
-        int bombLength = bomb.length();
-
-
-        for (int i = 0; i < strLength; i++) {
-            stack.push(str.charAt(i));
-
-            System.out.println("새로운 단계 : " + i);
-
-            if (stack.size() >= bombLength) {
-                boolean isSame = true;
-
-                System.out.println("stack : " + stack);
-                System.out.println("stack.size() : " + stack.size());
-                System.out.println("bombLength : " + bombLength);
-                System.out.println("==============================");
-
-                for (int j = 0; j < bombLength; j++) {
-                    System.out.println("for문 진입");
-                    System.out.println("stack의 크기 (= " + stack.size() + ") - bombLength (= " + bombLength + ") + j(= " + j + ") => " + stack.get(stack.size() - bombLength + j));
-                    System.out.println("bomb.charAt(" + j + ") : " + bomb.charAt(j));
-                    System.out.println(stack.get(stack.size() - bombLength + j) != bomb.charAt(j));
-                    if (stack.get(stack.size() - bombLength + j) != bomb.charAt(j)) {
-                        isSame = false;
-                        System.out.println("isSame : " + isSame);
+        // 분배 법칙을 생각하자!
+        for (int i = 0; i < length; i++) {
+            switch (str.charAt(i)) {
+                case '(':
+                    stack.push(str.charAt(i));
+                    multiplier *= 2;
+                    break;
+                case ')':
+                    if (stack.isEmpty() || stack.peek() != '(') {
+                        answer = 0;
                         break;
                     }
-                    System.out.println("for문의 " + j + "차 끝나고 다시 반복!\n");
-                }
-
-                if (isSame) {
-                    System.out.println("isSame이 true일 때 진입");
-                    for (int j = 0; j < bombLength; j++) {
-                        stack.pop();
+                    if (str.charAt(i - 1) == '(') {
+                        answer += multiplier;
                     }
-                }
+                    stack.pop();
+                    multiplier /= 2;
+                    break;
+                case '[':
+                    stack.push(str.charAt(i));
+                    multiplier *= 3;
+                    break;
+                case ']':
+                    if (stack.isEmpty() || stack.peek() != '[') {
+                        answer = 0;
+                        break;
+                    }
 
-                System.out.println("\n☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆");
+                    if (str.charAt(i - 1) == '[') {
+                        answer += multiplier;
+                    }
+                    stack.pop();
+                    multiplier /= 3;
+                    break;
             }
+
+            System.out.println(i + "번째");
+            System.out.println("stack : " + stack);
+            System.out.println("multiplier : " + multiplier);
+            System.out.println("answer : " + answer);
+            System.out.println("===========\n");
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        if (stack.isEmpty()) {
+            sb.append(answer);
+        } else {
+            sb.append("0");
         }
 
-        for (char ch : stack) {
-            sb.append(ch);
-        }
-
-        if (sb.length() == 0) {
-            sb.append("FRULA");
-        }
-
-        return sb.toString();
+        return Integer.parseInt(sb.toString());
     }
 
     public static void main(String[] args) throws IOException {
@@ -69,8 +73,7 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         String str = br.readLine();
-        String bomb = br.readLine();
 
-        System.out.println(main.solution(str, bomb));
+        System.out.println(main.solution(str));
     }
 }
