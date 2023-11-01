@@ -14,6 +14,8 @@ public class Main {
         int length = str.length();
 
         // 분배 법칙을 생각하자!
+        // 반례 : ()]()가 있어서 재채점된 문제
+        loop:
         for (int i = 0; i < length; i++) {
             switch (str.charAt(i)) {
                 case '(':
@@ -23,8 +25,9 @@ public class Main {
                 case ')':
                     if (stack.isEmpty() || stack.peek() != '(') {
                         answer = 0;
-                        break;
+                        break loop;
                     }
+
                     if (str.charAt(i - 1) == '(') {
                         answer += multiplier;
                     }
@@ -38,7 +41,7 @@ public class Main {
                 case ']':
                     if (stack.isEmpty() || stack.peek() != '[') {
                         answer = 0;
-                        break;
+                        break loop;
                     }
 
                     if (str.charAt(i - 1) == '[') {
@@ -56,15 +59,11 @@ public class Main {
             System.out.println("===========\n");
         }
         
-        StringBuilder sb = new StringBuilder();
-        
-        if (stack.isEmpty()) {
-            sb.append(answer);
-        } else {
-            sb.append("0");
+        if (!stack.isEmpty()) {
+            answer = 0;
         }
 
-        return Integer.parseInt(sb.toString());
+        return answer;
     }
 
     public static void main(String[] args) throws IOException {
