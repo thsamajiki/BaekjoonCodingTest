@@ -6,54 +6,57 @@ import java.io.InputStreamReader;
 import java.util.Stack;
 
 public class Main {
+    public int priority(char operator) {
+        if (operator == '(' || operator == ')') return 0;
+        else if (operator == '+' || operator == '-') return 1;
+        else if (operator == '*' || operator == '/') return 2;
+        return -1;
+    }
+
     public String solution(String str) {
-        String answer = "";
-        // cursor를 기준으로 앞에 있는 문자열은 left Stack에 쌓고 뒤에 있는 문자열은 right Stack에 쌓았다.
-        Stack<Character> left = new Stack<>();
-        Stack<Character> right = new Stack<>();
+        Stack<Character> stack = new Stack<>();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < str.length(); i++) {
-            switch (str.charAt(i)) {
-                case '<':
-                    if (!left.isEmpty()) {
-                        right.push(left.pop());
-                    }
-                    break;
-                case '>':
-                    if (!right.isEmpty()) {
-                        left.push(right.pop());
-                    }
-                    break;
+            char ch = str.charAt(i);
+
+            switch (ch) {
+                case '+':
                 case '-':
-                    if (!left.isEmpty()) {
-                        left.pop();
+                case '*':
+                case '/': // 우선순위가 큰 연산자가 먼저 계산되어야 하므로 현재 연산자의 우선순위보다 큰 연산자가 stack의 맨 위에 있다면 없을 때까지 pop한다.
+                    while (!stack.isEmpty() && priority(stack.peek()) >= priority(ch)) {
+                        sb.append(stack.pop());
                     }
+                    stack.push(ch);
+                    break;
+                case '(':
+                    stack.push(ch);
+                    break;
+                case ')': // (가 나올 때까지 stack 안의 연산자를 pop한다!
+                    while (!stack.isEmpty() && stack.peek() != '(') {
+                        sb.append(stack.pop());
+                    }
+                    stack.pop();
                     break;
                 default:
-                    left.push(str.charAt(i));
+                    sb.append(ch);
                     break;
             }
 
-            System.out.println(i + "번째");
-            System.out.println("left : " + left);
-            System.out.println("right : " + right);
-            System.out.println("===========\n");
+            System.out.println(i + 1 + "번째");
+            System.out.println(str);
+            System.out.println("ch : " + ch);
+            System.out.println("stack : " + stack);
+            System.out.println("sb : " + sb);
+            System.out.println("============\n");
         }
 
-
-
-        StringBuilder sb = new StringBuilder();
-
-        while (!left.isEmpty()) {
-            right.push(left.pop());
-        }
-        while (!right.isEmpty()) {
-            sb.append(right.pop());
+        while (!stack.isEmpty()) {
+            sb.append(stack.pop());
         }
 
-        answer = sb.toString();
-
-        return answer;
+        return sb.toString();
     }
 
     public static void main(String[] args) throws IOException {
@@ -61,12 +64,8 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int t = Integer.parseInt(br.readLine());
+        String str = br.readLine();
 
-        for (int tc = 0; tc < t; tc++) {
-            String str = br.readLine();
-
-            System.out.println(main.solution(str));
-        }
+        System.out.println(main.solution(str));
     }
 }
