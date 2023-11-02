@@ -6,62 +6,52 @@ import java.io.InputStreamReader;
 import java.util.Stack;
 
 public class Main {
-    public int solution(String str) {
-        int answer = 0;
-        int multiplier = 1;
-        Stack<Character> stack = new Stack<>();
+    public String solution(String str) {
+        String answer = "";
+        // cursor를 기준으로 앞에 있는 문자열은 left Stack에 쌓고 뒤에 있는 문자열은 right Stack에 쌓았다.
+        Stack<Character> left = new Stack<>();
+        Stack<Character> right = new Stack<>();
 
-        int length = str.length();
-
-        // 분배 법칙을 생각하자!
-        // 반례 : ()]()가 있어서 재채점된 문제
-        loop:
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < str.length(); i++) {
             switch (str.charAt(i)) {
-                case '(':
-                    stack.push(str.charAt(i));
-                    multiplier *= 2;
+                case '<':
+                    if (!left.isEmpty()) {
+                        right.push(left.pop());
+                    }
                     break;
-                case ')':
-                    if (stack.isEmpty() || stack.peek() != '(') {
-                        answer = 0;
-                        break loop;
+                case '>':
+                    if (!right.isEmpty()) {
+                        left.push(right.pop());
                     }
-
-                    if (str.charAt(i - 1) == '(') {
-                        answer += multiplier;
-                    }
-                    stack.pop();
-                    multiplier /= 2;
                     break;
-                case '[':
-                    stack.push(str.charAt(i));
-                    multiplier *= 3;
+                case '-':
+                    if (!left.isEmpty()) {
+                        left.pop();
+                    }
                     break;
-                case ']':
-                    if (stack.isEmpty() || stack.peek() != '[') {
-                        answer = 0;
-                        break loop;
-                    }
-
-                    if (str.charAt(i - 1) == '[') {
-                        answer += multiplier;
-                    }
-                    stack.pop();
-                    multiplier /= 3;
+                default:
+                    left.push(str.charAt(i));
                     break;
             }
 
             System.out.println(i + "번째");
-            System.out.println("stack : " + stack);
-            System.out.println("multiplier : " + multiplier);
-            System.out.println("answer : " + answer);
+            System.out.println("left : " + left);
+            System.out.println("right : " + right);
             System.out.println("===========\n");
         }
-        
-        if (!stack.isEmpty()) {
-            answer = 0;
+
+
+
+        StringBuilder sb = new StringBuilder();
+
+        while (!left.isEmpty()) {
+            right.push(left.pop());
         }
+        while (!right.isEmpty()) {
+            sb.append(right.pop());
+        }
+
+        answer = sb.toString();
 
         return answer;
     }
@@ -71,8 +61,12 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String str = br.readLine();
+        int t = Integer.parseInt(br.readLine());
 
-        System.out.println(main.solution(str));
+        for (int tc = 0; tc < t; tc++) {
+            String str = br.readLine();
+
+            System.out.println(main.solution(str));
+        }
     }
 }
