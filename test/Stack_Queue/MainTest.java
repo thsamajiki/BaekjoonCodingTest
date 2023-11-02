@@ -9,7 +9,9 @@ class MainTest {
     @Test
     void solution() {
         Main main = new Main();
-        assertEquals("BAPC", main.solution("<<BP<A>>Cd-"));
-        assertEquals("ThIsIsS3Cr3t", main.solution("ThIsIsS3Cr3t"));
+        assertEquals("ABC+*", main.solution("A*(B+C)"));
+        assertEquals("AB+", main.solution("A+B"));
+        assertEquals("ABC*+", main.solution("A+B*C"));
+        assertEquals("ABC*+DE/-", main.solution("A+B*C-D/E"));
     }
 }
