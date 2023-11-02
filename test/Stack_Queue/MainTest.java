@@ -9,7 +9,7 @@ class MainTest {
     @Test
     void solution() {
         Main main = new Main();
-        assertEquals(28, main.solution("(()[[]])([])"));
-        assertEquals(0, main.solution("[][]((])"));
+        assertEquals("BAPC", main.solution("<<BP<A>>Cd-"));
+        assertEquals("ThIsIsS3Cr3t", main.solution("ThIsIsS3Cr3t"));
     }
 }
