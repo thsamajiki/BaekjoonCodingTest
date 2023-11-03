@@ -9,9 +9,6 @@ class MainTest {
     @Test
     void solution() {
         Main main = new Main();
-        assertEquals("ABC+*", main.solution("A*(B+C)"));
-        assertEquals("AB+", main.solution("A+B"));
-        assertEquals("ABC*+", main.solution("A+B*C"));
-        assertEquals("ABC*+DE/-", main.solution("A+B*C-D/E"));
+        assertEquals(4, main.solution(6));
     }
 }
