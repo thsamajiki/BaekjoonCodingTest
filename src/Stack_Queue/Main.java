@@ -5,85 +5,37 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-class Point {
-    int x;
-    int y;
-
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-}
-
 public class Main {
-    static int n;
-    static int[][] map;
-    static Map<Integer, Character> moveInfoMap;
-    int[] dx = { 0, 1, 0, -1 };
-    int[] dy = { 1, 0, -1, 0 };
+    public int solution(int[] weights, int bridgeLength, int bridgeWeightLimit) {
+        int answer = 0;
 
-    public int solution() {
-        int nowX = 0;
-        int nowY = 0;
-        int time = 0;
-        int direction = 0;
-        Queue<Point> q = new LinkedList<>();
+        int bridgeWeightSum = 0;
+        Queue<Integer> bridges = new LinkedList<>();
+        Queue<Integer> trucks = new LinkedList<>();
 
-        map[nowX][nowY] = 2;
-        q.offer(new Point(nowX, nowY));
-
-        while (true) {
-            time++;
-
-            int nextX = nowX + dx[direction];
-            int nextY = nowY + dy[direction];
-
-            // 범위를 벗어날 때 종료
-            if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= n) {
-                break;
-            }
-
-            // 뱀 몸통 만날 때 종료
-            if (map[nextX][nextY] == 2) {
-                break;
-            }
-
-            // 사과가 있을 때 없을 때 처리
-            if (map[nextX][nextY] == 1) {
-                map[nextX][nextY] = 2;
-                q.offer(new Point(nextX, nextY)); // 머리가 새롭게 움직인 곳을 q에 넣어준다.
-            } else {
-                q.offer(new Point(nextX, nextY));
-                Point temp = q.poll(); // 꼬리 부분의 데이터는 삭제
-                map[temp.x][temp.y] = 0;
-            }
-
-            if (moveInfoMap.containsKey(time)) {
-                if (moveInfoMap.get(time) == 'D') {
-                    direction += 1;
-                    if (direction == 4) {
-                        direction = 0;
-                    }
-                } else {
-                    direction -= 1;
-                    if (direction == -1) {
-                        direction = 3;
-                    }
-                }
-            }
-
-            map[nextX][nextY] = 2;
-
-            nowX = nextX;
-            nowY = nextY;
+        for (int i = 0; i < bridgeLength; i++) {
+            bridges.offer(0);
         }
 
-        return time;
+        for (int i = 0; i < weights.length; i++) {
+            trucks.offer(weights[i]);
+        }
+
+        while (!bridges.isEmpty()) { // 더이상 넣을 트럭이 없을 때까지 반복 (반복 1번에 시간 + 1)
+            answer++;
+            bridgeWeightSum -= bridges.poll(); // 다리 무게에서 내려온 트럭 무게를 뺌
+
+            if (!trucks.isEmpty()) {
+                if (trucks.peek() + bridgeWeightSum <= bridgeWeightLimit) { // 앞의 트럭의 무게를 더해도 다리의 최대 하중보다 작다면
+                    bridgeWeightSum += trucks.peek();
+                    bridges.offer(trucks.poll()); // 다리에 트럭 추가
+                } else { // 다리의 최대 하중을 초과하면
+                    bridges.offer(0); // 다리 위에 트럭을 추가하지 않음
+                }
+            }
+        }
+
+        return answer;
     }
 
     public static void main(String[] args) throws IOException {
@@ -91,29 +43,19 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        n = Integer.parseInt(br.readLine());
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        map = new int[n][n];
+        int n = Integer.parseInt(st.nextToken()); // 다리를 건너는 트럭의 수
+        int w = Integer.parseInt(st.nextToken()); // 다리의 길이
+        int L = Integer.parseInt(st.nextToken()); // 다리의 최대 하중
 
-        int k = Integer.parseInt(br.readLine());
+        int[] truckWeights = new int[n];
 
-        for (int i = 0; i < k; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int x = Integer.parseInt(st.nextToken());
-            int y = Integer.parseInt(st.nextToken());
-            map[x - 1][y - 1] = 1;
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < n; i++) {
+            truckWeights[i] = Integer.parseInt(st.nextToken());
         }
 
-        int L = Integer.parseInt(br.readLine());
-
-        moveInfoMap = new HashMap<>();
-        for (int i = 0; i < L; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int time = Integer.parseInt(st.nextToken());
-            char direction = st.nextToken().charAt(0);
-            moveInfoMap.put(time, direction);
-        }
-
-        System.out.println(main.solution());
+        System.out.println(main.solution(truckWeights, w, L));
     }
 }
