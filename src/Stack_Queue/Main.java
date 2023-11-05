@@ -16,8 +16,7 @@ class Point {
 
     @Override
     public boolean equals(Object obj) {
-        Point point = (Point) obj;
-        return this.x == point.x && this.y == point.y;
+        return super.equals(obj);
     }
 }
 
@@ -50,10 +49,7 @@ public class Main {
             }
 
             // 뱀 몸통 만날 때 종료
-            // new int[]의 equals를 우리가 직접적으로 오버라이딩할 수 없는게 다르다.
-            // 우리가 만든 커스텀 클래스는 equals를 따로 오버라이딩할 수 잇고
-            // 이걸로 하면 contains 가 의도한 대로 동작하도록 하는게 가능하다.
-            if (q.contains(new Point(nextX, nextY))) {
+            if (map[nextX][nextY] == 2) {
                 break;
             }
 
