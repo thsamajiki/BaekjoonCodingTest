@@ -2,11 +2,15 @@ package Stack_Queue;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class MainTest {
 
     @Test
     void solution() {
         Main main = new Main();
-//        assertEquals(new ArrayList<>(List.of(1, 3, 5, 7, 4, 2, 6)), main.solution(7));
+        assertEquals(8, main.solution(new int[] { 7, 4, 5, 6 }, 2, 10));
+        assertEquals(101, main.solution(new int[] { 10 }, 100, 100));
+        assertEquals(110, main.solution(new int[] { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, 100, 100));
     }
 }
