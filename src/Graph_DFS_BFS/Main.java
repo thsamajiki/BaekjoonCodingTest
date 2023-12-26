@@ -3,37 +3,22 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Main {
-    private String solution(String str) {
-        String answer = "no";
-        Stack<Character> stack = new Stack<>();
+    static boolean[] visited;
+    static int[] nums;
+    static ArrayList<Integer> list;
 
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            if (ch == '(' || ch == '[') {
-                stack.push(ch);
-            } else if (ch == ')') {
-                if (stack.isEmpty() || stack.peek() != '(') {
-                    return "no";
-                } else {
-                    stack.pop();
-                }
-            } else if (ch == ']') {
-                if (stack.isEmpty() || stack.peek() != '[') {
-                    return "no";
-                } else {
-                    stack.pop();
-                }
-            }
+    private void solution(int start, int target) {
+        if (!visited[nums[start]]) {
+            visited[nums[start]] = true;
+            solution(nums[start], target);
+            visited[nums[start]] = false;
         }
 
-        if (stack.isEmpty()) {
-            answer = "yes";
-        }
-
-        return answer;
+        if (nums[start] == target) list.add(target);
     }
 
     public static void main(String[] args) throws IOException {
@@ -41,10 +26,27 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String str;
+        int N = Integer.parseInt(br.readLine());
 
-        while (!(str = br.readLine()).equals(".")) {
-            System.out.println(main.solution(str));
+        nums = new int[N + 1];
+
+        for (int i = 1; i <= N; i++) {
+            nums[i] = Integer.parseInt(br.readLine());
+        }
+
+        list = new ArrayList<>();
+        visited = new boolean[N + 1];
+
+        for (int i = 1; i <= N; i++) {
+            visited[i] = true;
+            main.solution(i, i);
+            visited[i] = false;
+        }
+
+        Collections.sort(list); // 작은 수 부터 출력하므로 정렬한다.
+        System.out.println(list.size());
+        for(int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
         }
     }
 }
