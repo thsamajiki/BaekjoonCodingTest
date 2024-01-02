@@ -6,21 +6,25 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static int N, R, Q;
-    static ArrayList<Integer>[] tree; // 인접 리스트로 간선의 정보를 저장
-    static int[] subTree; // 각 노드의 서브트리
+    static int N, K;
+    static int[] kits;
     static boolean[] visited;
+    static int count = 0;
 
-    public int solution(int root) {
-        int count = 1;
-        for(int node: tree[root]) {
-            if (!visited[node]) {
-                visited[node] = true;
-                count += solution(node); // 자식노드의 개수를 더해준다.
+    public void solution(int sum, int level) {
+        if (level == N) {
+            count++;
+            return;
+        }
+        else {
+            for (int i = 1; i < kits.length; i++) {
+                if (!visited[i] && sum + kits[i] - K >= 500) {
+                    visited[i] = true;
+                    solution(sum + kits[i] - K, level + 1);
+                    visited[i] = false;
+                }
             }
         }
-
-        return subTree[root] = count;
     }
 
     public static void main(String[] args) throws IOException {
@@ -29,32 +33,19 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        R = Integer.parseInt(st.nextToken());
-        Q = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken()); // 운동 키트의 개수
+        K = Integer.parseInt(st.nextToken()); // 하루가 지날 때마다 감소하는 중량
 
-        tree = new ArrayList[N + 1];
-        subTree = new int[N + 1];
+        kits = new int[N + 1];
         visited = new boolean[N + 1];
 
-        for (int i = 1; i < N + 1; i++) {
-            tree[i] = new ArrayList<>();
+        st = new StringTokenizer(br.readLine());
+        for (int i = 1; i <= N; i++) {
+            kits[i] = Integer.parseInt(st.nextToken());
         }
 
-        for (int i = 0; i < N - 1; i++) {
-            st = new StringTokenizer(br.readLine());
-            int from = Integer.parseInt(st.nextToken());;
-            int to = Integer.parseInt(st.nextToken());;
-            tree[from].add(to);
-            tree[to].add(from);
-        }
+        main.solution(500, 0);
 
-        visited[R] = true;
-        main.solution(R);
-
-        for (int i = 0; i < Q; i++) {
-            int U = Integer.parseInt(br.readLine());
-            System.out.println(subTree[U]);
-        }
+        System.out.println(count);
     }
 }
