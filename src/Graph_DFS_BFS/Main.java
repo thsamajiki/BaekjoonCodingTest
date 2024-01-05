@@ -6,23 +6,22 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static int N, K;
-    static int[] kits;
-    static boolean[] visited;
-    static int count = 0;
+    static int k;
+    static ArrayList<Integer> list;
+    static int[] S;
 
-    public void solution(int sum, int level) {
-        if (level == N) {
-            count++;
+    public void solution(int start, int L) {
+        if (L == 6) {
+            for(int num: list) {
+                System.out.print(num + " ");
+            }
+            System.out.println();
             return;
-        }
-        else {
-            for (int i = 1; i < kits.length; i++) {
-                if (!visited[i] && sum + kits[i] - K >= 500) {
-                    visited[i] = true;
-                    solution(sum + kits[i] - K, level + 1);
-                    visited[i] = false;
-                }
+        } else {
+            for (int i = start; i < k; i++) {
+                list.add(S[i]);
+                solution(i + 1, L + 1);
+                list.remove(list.size() - 1);
             }
         }
     }
@@ -32,20 +31,24 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken()); // 운동 키트의 개수
-        K = Integer.parseInt(st.nextToken()); // 하루가 지날 때마다 감소하는 중량
+        while (true) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            k = Integer.parseInt(st.nextToken());
 
-        kits = new int[N + 1];
-        visited = new boolean[N + 1];
+            if (k == 0) {
+                break;
+            }
 
-        st = new StringTokenizer(br.readLine());
-        for (int i = 1; i <= N; i++) {
-            kits[i] = Integer.parseInt(st.nextToken());
+            S = new int[k];
+            for (int i = 0; i < k; i++) {
+                S[i] = Integer.parseInt(st.nextToken());
+            }
+
+            list = new ArrayList<>();
+
+            main.solution(0, 0);
+
+            System.out.println();
         }
-
-        main.solution(500, 0);
-
-        System.out.println(count);
     }
 }
