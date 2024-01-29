@@ -7,21 +7,20 @@ import java.util.*;
 
 public class Main {
     static int k;
-    static ArrayList<Integer> list;
+    static int[] nums;
     static int[] S;
 
     public void solution(int start, int L) {
         if (L == 6) {
-            for(int num: list) {
+            for(int num: nums) {
                 System.out.print(num + " ");
             }
             System.out.println();
             return;
         } else {
             for (int i = start; i < k; i++) {
-                list.add(S[i]);
+                nums[L] = S[i];
                 solution(i + 1, L + 1);
-                list.remove(list.size() - 1);
             }
         }
     }
@@ -44,7 +43,7 @@ public class Main {
                 S[i] = Integer.parseInt(st.nextToken());
             }
 
-            list = new ArrayList<>();
+            nums = new int[6];
 
             main.solution(0, 0);
 
