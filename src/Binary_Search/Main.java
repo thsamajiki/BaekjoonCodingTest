@@ -3,40 +3,31 @@ package Binary_Search;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int N;
-    static int[] solutions;
+    static int N, M; // N: 나무의 수, M: 집으로 가져가려고 하는 나무의 길이
 
-    public int[] solution(int N) {
-        int[] answer = new int[2];
-        int diff = Integer.MAX_VALUE;
+    public long solution(long[] heights) {
+        Arrays.sort(heights);
 
-        for (int i = 0; i < N; i++) { // solutions[i] 값에 대하여 나머지 하나의 용액 선택
-            int left = i + 1; // 현재 용액 다음 ~ 끝까지 이분탐색
-            int right = N - 1;
+        long left = 0; // 절단기 최소 높이
+        long right = heights[N - 1]; // 절단기 최대 높이
 
-            while (left <= right) {
-                int mid = (left + right) / 2;
-
-                int sum = solutions[i] + solutions[mid];
-
-                if (Math.abs(sum) < diff) {
-                    answer[0] = solutions[i];
-                    answer[1] = solutions[mid];
-                    diff = Math.abs(sum);
-                }
-
-                if (sum < 0) {
-                    left = mid + 1;
-                } else {
-                    right = mid - 1;
-                }
+        while (left <= right) {
+            long mid = (left + right) / 2;
+            long sum = 0;
+            
+            for(long height: heights) {
+                if (height > mid) sum += height - mid;
             }
+
+            if (sum >= M) left = mid + 1;
+            else right = mid - 1;
         }
 
-        return answer;
+        return right;
     }
 
     public static void main(String[] args) throws IOException {
@@ -44,19 +35,16 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        N = Integer.parseInt(br.readLine()); // 전체 용액의 수
-
         StringTokenizer st = new StringTokenizer(br.readLine());
-        solutions = new int[N]; // 용액의 특성값 배열
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+
+        long[] heights = new long[N];
+        st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
-            solutions[i] = Integer.parseInt(st.nextToken());
+            heights[i] = Integer.parseInt(st.nextToken());
         }
 
-        int[] arr = main.solution(N);
-        
-        for(int num: arr) {
-            System.out.print(num + " ");
-        }
-        System.out.println();
+        System.out.println(main.solution(heights));
     }
 }
