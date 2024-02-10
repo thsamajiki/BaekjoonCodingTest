@@ -3,90 +3,121 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 class Point {
     int x;
     int y;
-    int distance;
-    boolean destroyedWall;
 
-    public Point(int x, int y, int distance, boolean destroyedWall) {
+    public Point(int x, int y) {
         this.x = x;
         this.y = y;
-        this.distance = distance;
-        this.destroyedWall = destroyedWall;
     }
 }
 
 public class Main {
-    static int N, M, answer = Integer.MAX_VALUE;
+    static int M, N, answer;
     static int[] dx = { -1, 0, 1,  0 };
     static int[] dy = {  0, 1, 0, -1 };
+    static Queue<Point> q = new LinkedList<>();
     static int[][] map;
-    static boolean[][][] visited;
+    static boolean[][] visited;
+    static int[][] days;
 
-    public int solution(int x, int y) {
-        Queue<Point> q = new LinkedList<>();
-        q.offer(new Point(x, y, 1, false));
-
+    public void BFS() {
         while (!q.isEmpty()) {
             Point now = q.poll();
+            int nowX = now.x;
+            int nowY = now.y;
 
-            if (now.x == N && now.y == M) {
-                answer = now.distance;
-                return answer;
-            } else {
-                for (int i = 0; i < 4; i++) {
-                    int nextX = now.x + dx[i];
-                    int nextY = now.y + dy[i];
-                    int nextDistance = now.distance + 1;
+            for (int i = 0; i < 4; i++) {
+                int nextX = nowX + dx[i];
+                int nextY = nowY + dy[i];
 
-                    if (nextX < 1 || nextX > N || nextY < 1 || nextY > M) continue;
-
-                    if (now.destroyedWall) { // 벽을 부순 적이 있을 때
-                        // 해당 지점이 벽이 아니고 방문한 적이 없다면 큐에 정보를 넣는다.
-                        if (map[nextX][nextY] == 0 && !visited[nextX][nextY][1]) {
-                            visited[nextX][nextY][1] = true;
-                            q.offer(new Point(nextX, nextY, nextDistance, true));
-                        }
-                        // 한번 부순 적이 있다면 또 부수고 갈 수 없기 때문에 pass
-                    } else { // 벽을 부순 적이 없을 때
-                        if (map[nextX][nextY] == 1) { // 벽이라면 벽을 부수고 큐에 값을 넣는다.
-                            visited[nextX][nextY][1] = true;
-                            q.offer(new Point(nextX, nextY, nextDistance, true));
-                        } else if (!visited[nextX][nextY][0]){ // 벽이 아니고 방문한 적이 없다면 큐에 값을 넣는다.
-                            visited[nextX][nextY][0] = true;
-                            q.offer(new Point(nextX, nextY, nextDistance, false));
-                        }
-                    }
+                if(nextX < 0 || nextX >= N || nextY < 0 || nextY >= M) continue;
+                if (!visited[nextX][nextY] && map[nextX][nextY] == 0) {
+                    visited[nextX][nextY] = true;
+                    map[nextX][nextY] = 1;
+                    q.offer(new Point(nextX, nextY));
+                    days[nextX][nextY] = days[nowX][nowY] + 1;
                 }
             }
         }
-
-        return -1;
     }
 
     public static void main(String[] args) throws IOException {
         Main main = new Main();
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
 
-        map = new int[N + 1][M + 1];
-        for (int i = 1; i <= N; i++) {
-            String row = br.readLine();
-            for (int j = 1; j <= M; j++) {
-                map[i][j] = row.charAt(j - 1) - '0';
+        M = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+
+        map = new int[N][M];
+        visited = new boolean[N][M];
+        days = new int[N][M];
+
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < M; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        visited = new boolean[N + 1][M + 1][2];
+        boolean allRipen = true;
+        loop:
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j] == 0 || map[i][j] == -1) {
+                    allRipen = false;
+                    break loop;
+                }
+            }
+        }
 
-        visited[1][1][0] = true;
-        System.out.println(main.solution(1, 1));
+        if (allRipen) {
+            System.out.println(0);
+            return;
+        }
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j] == 1) {
+                    q.offer(new Point(i, j));
+                    days[i][j] = 0;
+
+                } else {
+                    days[i][j] = -1;
+                }
+            }
+        }
+
+        main.BFS();
+
+        boolean notAllRipen = true;
+        loop:
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j] == 0 && days[i][j] == -1) {
+                    notAllRipen = false;
+                    break loop;
+                }
+            }
+        }
+
+        if (!notAllRipen) {
+            System.out.println(-1);
+            return;
+        }
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                answer = Math.max(answer, days[i][j]);
+            }
+        }
+
+        System.out.println(answer);
     }
 }
