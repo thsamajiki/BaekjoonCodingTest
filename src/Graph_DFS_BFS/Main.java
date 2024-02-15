@@ -7,43 +7,36 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
-class Point {
-    int x;
-    int y;
-
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
 public class Main {
-    static int M, N, answer;
-    static int[] dx = { -1, 0, 1,  0 };
-    static int[] dy = {  0, 1, 0, -1 };
-    static Queue<Point> q = new LinkedList<>();
-    static int[][] map;
-    static boolean[][] visited;
-    static int[][] days;
+    static int F, S, G, U, D;
+    static int[] buttonCounts;
 
-    public void BFS() {
+    public void bfs(int f, int s, int g, int u, int d) {
+        Queue<Integer> q = new LinkedList<>();
+        buttonCounts[s] = 0;
+        q.offer(s);
+
         while (!q.isEmpty()) {
-            Point now = q.poll();
-            int nowX = now.x;
-            int nowY = now.y;
+            int now = q.poll();
 
-            for (int i = 0; i < 4; i++) {
-                int nextX = nowX + dx[i];
-                int nextY = nowY + dy[i];
-
-                if(nextX < 0 || nextX >= N || nextY < 0 || nextY >= M) continue;
-                if (!visited[nextX][nextY] && map[nextX][nextY] == 0) {
-                    visited[nextX][nextY] = true;
-                    map[nextX][nextY] = 1;
-                    q.offer(new Point(nextX, nextY));
-                    days[nextX][nextY] = days[nowX][nowY] + 1;
-                }
+            if (now == g) {
+                System.out.println(buttonCounts[now]);
+                return;
             }
+
+            if (u > 0 && now + u <= f && buttonCounts[now + u] == 0) { // 현재 위치 + 위로 <= 최고층 && 방문 안했으면
+                buttonCounts[now + u] = buttonCounts[now] + 1;
+                q.offer(now + u);
+            }
+
+            if (d > 0 && now - d >= 1 && buttonCounts[now - d] == 0) { // 현재 위치 - 아래로 >= 1 && 방문 안했으면
+                buttonCounts[now - d] = buttonCounts[now] + 1;
+                q.offer(now - d);
+            }
+        }
+
+        if (buttonCounts[g] == 0) {
+            System.out.println("use the stairs");
         }
     }
 
@@ -52,72 +45,14 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        M = Integer.parseInt(st.nextToken());
-        N = Integer.parseInt(st.nextToken());
+        F = Integer.parseInt(st.nextToken());
+        S = Integer.parseInt(st.nextToken());
+        G = Integer.parseInt(st.nextToken());
+        U = Integer.parseInt(st.nextToken());
+        D = Integer.parseInt(st.nextToken());
 
-        map = new int[N][M];
-        visited = new boolean[N][M];
-        days = new int[N][M];
+        buttonCounts = new int[F + 1];
 
-        for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < M; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-            }
-        }
-
-        boolean allRipen = true;
-        loop:
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (map[i][j] == 0 || map[i][j] == -1) {
-                    allRipen = false;
-                    break loop;
-                }
-            }
-        }
-
-        if (allRipen) {
-            System.out.println(0);
-            return;
-        }
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (map[i][j] == 1) {
-                    q.offer(new Point(i, j));
-                    days[i][j] = 0;
-
-                } else {
-                    days[i][j] = -1;
-                }
-            }
-        }
-
-        main.BFS();
-
-        boolean notAllRipen = true;
-        loop:
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (map[i][j] == 0 && days[i][j] == -1) {
-                    notAllRipen = false;
-                    break loop;
-                }
-            }
-        }
-
-        if (!notAllRipen) {
-            System.out.println(-1);
-            return;
-        }
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                answer = Math.max(answer, days[i][j]);
-            }
-        }
-
-        System.out.println(answer);
+        main.bfs(F, S, G, U, D);
     }
 }
