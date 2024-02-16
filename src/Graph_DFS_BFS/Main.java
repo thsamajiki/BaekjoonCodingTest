@@ -3,55 +3,51 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
 
 public class Main {
-    static int F, S, G, U, D;
-    static int[] buttonCounts;
+    /*
+    * 재귀탐색을 하게되면 기본적으로 '열'은 서로 다른 위치이니
+    * 우리가 검사할 것은 다른 퀸과 동일한 '행'에 위치하는지와 대각선상에 위치하는지를 검사하면 된다.
+    * 만약 해당 위치가 공격받지 않는 위치라면 다음 재귀를 호출하고, 아닐 경우는 다음 반복문으로 넘어간다.
+    */
+    static int N, count = 0;
+    static int[] arr; // 각 원소의 index를 '열'이라 생각하고, 원소 값을 '행'이라 생각하기
 
-    public void bfs(int f, int s, int g, int u, int d) {
-        Queue<Integer> q = new LinkedList<>();
-        q.offer(s);
-
-        while (!q.isEmpty()) {
-            int now = q.poll();
-
-            if (now == g) {
-                System.out.println(buttonCounts[now]);
-                return;
-            }
-
-            if (u > 0 && now + u <= f && buttonCounts[now + u] == 0) { // 현재 위치 + 위로 <= 최고층 && 방문 안했으면
-                buttonCounts[now + u] = buttonCounts[now] + 1;
-                q.offer(now + u);
-            }
-
-            if (d > 0 && now - d >= 1 && buttonCounts[now - d] == 0) { // 현재 위치 - 아래로 >= 1 && 방문 안했으면
-                buttonCounts[now - d] = buttonCounts[now] + 1;
-                q.offer(now - d);
-            }
+    public void solution(int depth) {
+        if (depth == N) {
+            count++;
+            return;
         }
+        for (int i = 0; i < N; i++) {
+            arr[depth] = i;
+            boolean isPossible = true;
 
-        if (buttonCounts[g] == 0) {
-            System.out.println("use the stairs");
+            // 놓을 수 있는 위치일 경우 재귀호출
+            for (int j = 0; j < depth; j++) {
+                // 1. 같은 행에 존재할 경우
+                // 2. 대각선상에 놓여있는 경우
+                if (arr[depth] == arr[j] || Math.abs(depth - j) == Math.abs(arr[depth] - arr[j])) {
+                    isPossible = false;
+                    break;
+                }
+            }
+
+            if (isPossible) {
+                solution(depth + 1);
+            }
         }
     }
 
     public static void main(String[] args) throws IOException {
         Main main = new Main();
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        F = Integer.parseInt(st.nextToken());
-        S = Integer.parseInt(st.nextToken());
-        G = Integer.parseInt(st.nextToken());
-        U = Integer.parseInt(st.nextToken());
-        D = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(br.readLine());
+        arr = new int[N];
 
-        buttonCounts = new int[F + 1];
+        main.solution(0);
 
-        main.bfs(F, S, G, U, D);
+        System.out.println(count);
     }
 }
