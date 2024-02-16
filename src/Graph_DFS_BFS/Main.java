@@ -6,24 +6,24 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int N, minCost = Integer.MAX_VALUE;
-    static int[][] W;
+    static int R, C, answer = 1;
+    static int[] dx = { -1, 0, 1,  0 };
+    static int[] dy = {  0, 1, 0, -1 };
+    static char[][] board;
     static boolean[] visited;
 
-    public void solution(int start, int now, int depth, int sum) {
-        if (depth == N - 1) { // 모든 도시 방문한 경우
-            if (W[now][start] > 0) { // 마지막 도시에서 출발했던 시작 도시로 가는 비용 더하기
-                sum += W[now][start];
-                minCost = Math.min(minCost, sum);
-            }
-            return;
-        }
+    public void solution(int x, int y, int count) {
+        for (int i = 0; i < 4; i++) {
+            int nextX = x + dx[i];
+            int nextY = y + dy[i];
 
-        for (int i = 0; i < N; i++) {
-            if (!visited[i] && W[now][i] > 0) {
-                visited[i] = true;
-                solution(start, i, depth + 1, sum + W[now][i]);
-                visited[i] = false;
+            if (nextX < 0 || nextX > R - 1 || nextY < 0 || nextY > C - 1) continue;
+            if (!visited[board[nextX][nextY] - 'A']) {
+                visited[board[nextX][nextY] - 'A'] = true;
+                solution(nextX, nextY, count + 1);
+                visited[board[nextX][nextY] - 'A'] = false;
+            } else {
+                answer = Math.max(answer, count);
             }
         }
     }
@@ -31,23 +31,23 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Main main = new Main();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        N = Integer.parseInt(br.readLine());
-        W = new int[N][N];
-        visited = new boolean[N];
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        board = new char[R][C];
+        visited = new boolean[26];
 
-        for (int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < N; j++) {
-                W[i][j] = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < R; i++) {
+            String input = br.readLine();
+            for (int j = 0; j < C; j++) {
+                board[i][j] = input.charAt(j);
             }
         }
 
-        for (int i = 0; i < N; i++) {
-            visited[i] = true;
-            main.solution(i, i, 0, 0);
-        }
+        visited[board[0][0] - 'A'] = true;
+        main.solution(0, 0, 1);
 
-        System.out.println(minCost);
+        System.out.println(answer);
     }
 }
