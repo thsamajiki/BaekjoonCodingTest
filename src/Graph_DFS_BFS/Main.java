@@ -13,7 +13,6 @@ public class Main {
 
     public void bfs(int f, int s, int g, int u, int d) {
         Queue<Integer> q = new LinkedList<>();
-        buttonCounts[s] = 0;
         q.offer(s);
 
         while (!q.isEmpty()) {
