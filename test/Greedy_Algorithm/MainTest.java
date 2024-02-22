@@ -10,9 +10,10 @@ class MainTest {
     void solution() {
         Main main = new Main();
 
-        assertEquals(1998, main.solution(new String[]{"AAA", "AAA"}));
-        assertEquals(99437, main.solution(new String[]{"GCF", "ACDEB"}));
-        assertEquals(45, main.solution(new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"}));
-        assertEquals(187, main.solution(new String[]{"AB", "BA"}));
+        assertEquals(4, main.solution(18));
+        assertEquals(-1, main.solution(4));
+        assertEquals(2, main.solution(6));
+        assertEquals(3, main.solution(9));
+        assertEquals(3, main.solution(11));
     }
 }
