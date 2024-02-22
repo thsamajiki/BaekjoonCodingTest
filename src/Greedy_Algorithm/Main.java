@@ -3,31 +3,24 @@ package Greedy_Algorithm;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 
 public class Main {
-    public int solution(String[] words) {
-        int answer = 0;
-        int[] letters = new int[26];
+    public int solution(int N) {
+        int answer = -1;
 
-        for(String word: words) {
-            int digit = word.length() - 1;
+        int fiveCount = N / 5;
+        int threeCount = 0;
 
-            for(char letter: word.toCharArray()) {
-                int index = letter - 'A';
+        while (fiveCount >= 0) {
+            int remainingWeight = N - fiveCount * 5;
 
-                letters[index] += (int)Math.pow(10, digit);
-                digit--;
+            if ((remainingWeight) % 3 == 0) {
+                threeCount = remainingWeight / 3;
+                answer = fiveCount + threeCount;
+                break;
             }
-        }
 
-        Arrays.sort(letters);
-        int max = 9;
-
-        for (int i = letters.length - 1; i >= 0; i--) {
-            if (max == 0) break;
-            answer += letters[i] * max;
-            max--;
+            fiveCount--;
         }
 
         return answer;
@@ -39,12 +32,7 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int N = Integer.parseInt(br.readLine());
-        String[] words = new String[N];
 
-        for (int i = 0; i < N; i++) {
-            words[i] = br.readLine();
-        }
-
-        System.out.println(main.solution(words));
+        System.out.println(main.solution(N));
     }
 }
