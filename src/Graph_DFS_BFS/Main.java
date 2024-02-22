@@ -3,46 +3,34 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int N, M, K ,X;
-    static ArrayList<ArrayList<Integer>> map;
-    static int[] distances;
+    static int M, N, answer;
+    static int[][] map, dp; // dp 배열에 "x, y에서 M - 1, N - 1까지 이동하는 경로의 수" 를 저장
+    static int[] dx = { -1, 0, 1,  0 };
+    static int[] dy = {  0, 1, 0, -1 };
 
-    public void BFS() {
-        distances[X] = 0;
+    public int DFS(int x, int y) {
+        if (x == M - 1 && y == N - 1) { // 도착 지점까지 도달했을 경우
+            return 1;
+        }
+        if (dp[x][y] != -1) return dp[x][y]; // 방문했다면 저장된 값을 리턴 => 시간을 단축
 
-        Queue<Integer> q = new LinkedList<>();
-        q.offer(X);
+        // 방문 안 했다면
+        dp[x][y] = 0; // 먼저 0으로 세팅
+        for (int i = 0; i < 4; i++) {
+            int nextX = x + dx[i];
+            int nextY = y + dy[i];
 
-        while (!q.isEmpty()) {
-            int now = q.poll();
-
-            for (int i = 0; i < map.get(now).size(); i++) {
-                int next = map.get(now).get(i);
-
-                if (distances[next] == -1) {
-                    distances[next] = distances[now] + 1;
-                    q.offer(next);
-                }
+            if (nextX < 0 || nextX > M - 1 || nextY < 0 || nextY > N - 1) continue;
+            // map[nextX][nextY]에서 끝점까지 도달하는 경로의 개수를 더한다
+            if (map[x][y] > map[nextX][nextY]) {
+                dp[x][y] += DFS(nextX, nextY);
             }
         }
 
-        boolean flag = false;
-        for (int i = 1; i <= N; i++) {
-            if (distances[i] == K) {
-                System.out.println(i);
-                flag = true;
-            }
-        }
-
-        if (!flag) {
-            System.out.println(-1);
-        }
+        return dp[x][y];
     }
 
     public static void main(String[] args) throws IOException {
@@ -50,26 +38,21 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
-        X = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
 
-        map = new ArrayList<>();
-        distances = new int[N + 1];
-        for (int i = 0; i <= N; i++) {
-            map.add(new ArrayList<>());
-            distances[i] = -1;
-        }
+        map = new int[M][N];
+        dp = new int[M][N];
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
-            int A = Integer.parseInt(st.nextToken());
-            int B = Integer.parseInt(st.nextToken());
-
-            map.get(A).add(B);
+            for (int j = 0; j < N; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+                dp[i][j] = -1; // -1은 아직 방문 전, 방문한 곳은 0 이상으로 표시
+            }
         }
 
-        main.BFS();
+        answer = main.DFS(0, 0);
+        System.out.println(answer);
     }
 }
