@@ -5,27 +5,40 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
+class Consulting {
+    int days;
+    int money;
+
+    public Consulting(int days, int money) {
+        this.days = days;
+        this.money = money;
+    }
+}
+
 public class Main {
-    static int n;
+    static Consulting[] arr;
 
-    public int solution(int[] boxes) {
-        int answer = 0;
+    public int solution(int N) {
+        int[] dp = new int[N + 2]; // 날짜 i부터 상담을 했을 때 벌 수 있는 돈의 최댓값
+        // 날짜의 마지막 날부터 첫 날까지 거꾸로 dp 배열을 구해나간다.
+        // 예를 들어 dp[5]는 5일부터 일한 값 중 최댓값이다.
+        // dp[1]은 마지막 날의 상담을 골라서 했을 때 벌 수 있는 돈의 최댓값
+        // 그러므로 dp[1]을 구해주면 된다.
 
-        int[] dp = new int[n];
+        for (int i = N; i >= 1; i--) {
+            int next = i + arr[i].days;
 
-        for (int i = 0; i < n; i++) {
-            dp[i] = 1;
-
-            for (int j = 0; j < i; j++) {
-                if (boxes[i] > boxes[j]) {
-                    dp[i] = Math.max(dp[i], dp[j] + 1);
-                }
+            if (next > N + 1) { // 상담할 수 있는 날짜를 넘어가는 경우
+                dp[i] = dp[i + 1]; // 그 전의 상담 가능한 일자의 돈의 최댓값을 가져옴
+            } else { // 상담할 수 있는 날짜인 경우
+                // 1. 상담하지 않았을 때(dp[i + 1])
+                // 2. 상담했을 때 총 벌 수 있는 금액(arr[i].money + dp[next])
+                // 위 두 경우 중 더 큰 값을 dp에 넣어준다.
+                dp[i] = Math.max(dp[i + 1], arr[i].money + dp[next]);
             }
-
-            answer = Math.max(answer, dp[i]);
         }
 
-        return answer;
+        return dp[1];
     }
 
     public static void main(String[] args) throws IOException {
@@ -33,15 +46,18 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        n = Integer.parseInt(br.readLine());
+        int N = Integer.parseInt(br.readLine());
 
-        int[] boxes = new int[n];
+        arr = new Consulting[N + 1];
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < n; i++) {
-            boxes[i] = Integer.parseInt(st.nextToken());
+        for (int i = 1; i <= N; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int days = Integer.parseInt(st.nextToken());
+            int money = Integer.parseInt(st.nextToken());
+
+            arr[i] = new Consulting(days, money);
         }
 
-        System.out.println(main.solution(boxes));
+        System.out.println(main.solution(N));
     }
 }
