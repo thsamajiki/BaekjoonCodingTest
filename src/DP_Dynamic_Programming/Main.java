@@ -17,7 +17,7 @@ public class Main {
             dp[i] = 1;
 
             for (int j = 0; j < i; j++) {
-                if (boxes[j] < boxes[i]) {
+                if (boxes[i] > boxes[j]) {
                     dp[i] = Math.max(dp[i], dp[j] + 1);
                 }
             }
