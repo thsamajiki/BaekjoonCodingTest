@@ -3,37 +3,48 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.*;
 
-class Consulting {
-    int days;
-    int money;
+class Point {
+    int x;
+    int y;
 
-    public Consulting(int days, int money) {
-        this.days = days;
-        this.money = money;
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 }
 
 public class Main {
-    static int N, answer;
-    static Consulting[] arr;
+    static int N, houseCount = 0, areaCount = 1;
+    static ArrayList<Integer> list;
+    static int[] dx = { -1, 0, 1,  0 };
+    static int[] dy = {  0, 1, 0, -1 };
+    static int[][] map;
+    static boolean[][] visited;
 
-    public void solution(int index, int money) {
-        if (index >= N + 1) {
-            answer = Math.max(answer, money);
-            return;
+    public void BFS(int x, int y) {
+        Queue<Point> q = new LinkedList<>();
+        q.offer(new Point(x, y));
+        visited[x][y] = true;
+        map[x][y] = areaCount;
+        houseCount = 1;
+
+        while (!q.isEmpty()) {
+            Point now = q.poll();
+            for (int i = 0; i < 4; i++) {
+                int nextX = now.x + dx[i];
+                int nextY = now.y + dy[i];
+
+                if (nextX < 0 || nextX > N - 1 || nextY < 0 || nextY > N - 1) continue;
+                if (!visited[nextX][nextY] && map[nextX][nextY] == 1) {
+                    visited[nextX][nextY] = true;
+                    map[nextX][nextY] = areaCount;
+                    houseCount++;
+                    q.offer(new Point(nextX, nextY));
+                }
+            }
         }
-
-        // N이 7이면 8일에 퇴사를 한다.
-        // 5일에 3일 걸리는 상담을 하기 시작하면 5, 6, 7일로 상담을 한다.
-        if (index + arr[index].days - 1 <= N) {
-            solution(index + arr[index].days, money + arr[index].money);
-        } else {
-            solution(index + arr[index].days, money);
-        }
-
-        solution(index + 1, money); // 현재 일을 선택하지 않을 경우, 이익은 그대로 둔 채 다음날로 넘어감
     }
 
     public static void main(String[] args) throws IOException {
@@ -42,18 +53,34 @@ public class Main {
 
         N = Integer.parseInt(br.readLine());
 
-        arr = new Consulting[N + 1];
+        map = new int[N][N];
+        visited = new boolean[N][N];
+        list = new ArrayList<>();
 
-        for (int i = 1; i <= N; i++) {
+        for (int i = 0; i < N; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-            int days = Integer.parseInt(st.nextToken());
-            int money = Integer.parseInt(st.nextToken());
-
-            arr[i] = new Consulting(days, money);
+            String str = st.nextToken();
+            for (int j = 0; j < N; j++) {
+                map[i][j] = str.charAt(j) - '0';
+            }
         }
 
-        main.solution(1, 0);
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (!visited[i][j] && map[i][j] == 1) {
+                    main.BFS(i, j);
+                    list.add(houseCount);
+                    areaCount++;
+                }
+            }
+        }
 
-        System.out.println(answer);
+        System.out.println(areaCount - 1);
+
+        Collections.sort(list);
+        
+        for(int houseCount: list) {
+            System.out.println(houseCount);
+        }
     }
 }
