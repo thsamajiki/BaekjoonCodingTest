@@ -5,22 +5,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
-    public int solution(int N) {
-        int answer = -1;
+    public int solution(String str) {
+        int answer = Integer.MAX_VALUE;
 
-        int fiveCount = N / 5;
-        int threeCount = 0;
+        String[] subtraction = str.split("-");
 
-        while (fiveCount >= 0) {
-            int remainingWeight = N - fiveCount * 5;
+        for (int i = 0; i < subtraction.length; i++) {
+            int temp = 0;
 
-            if ((remainingWeight) % 3 == 0) {
-                threeCount = remainingWeight / 3;
-                answer = fiveCount + threeCount;
-                break;
+            String[] addition = subtraction[i].split("[+]");
+
+            for (int j = 0; j < addition.length; j++) {
+                temp += Integer.parseInt(addition[j]);
             }
 
-            fiveCount--;
+            if (answer == Integer.MAX_VALUE) {
+                answer = temp;
+            } else {
+                answer -= temp;
+            }
         }
 
         return answer;
@@ -31,8 +34,8 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        String str = br.readLine();
 
-        System.out.println(main.solution(N));
+        System.out.println(main.solution(str));
     }
 }
