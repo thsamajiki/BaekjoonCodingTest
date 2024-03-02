@@ -37,9 +37,9 @@ public class Main {
         for (int i = 1; i <= length1; i++) {
             for (int j = 1; j <= length2; j++) {
                 if (str1.charAt(i - 1) == str2.charAt(j - 1)) { // 해당 위치의 문자가 일치하면
-                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                    dp[i][j] = dp[i - 1][j - 1] + 1; // 대각선의 값을 참고하여 LCS의 값을 + 1한다.
                 } else { // 해당 위치의 문자가 일치하지 않으면
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // 각 문자열의 이전 문자 중 최대 LCS값을 선택.
                 }
             }
         }
