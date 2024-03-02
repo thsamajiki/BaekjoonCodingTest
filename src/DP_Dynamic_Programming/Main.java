@@ -3,42 +3,36 @@ package DP_Dynamic_Programming;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
-
-class Consulting {
-    int days;
-    int money;
-
-    public Consulting(int days, int money) {
-        this.days = days;
-        this.money = money;
-    }
-}
 
 public class Main {
-    static Consulting[] arr;
+    public int solution(String str1, String str2) {
+        int length1 = str1.length();
+        int length2 = str2.length();
 
-    public int solution(int N) {
-        int[] dp = new int[N + 2]; // 날짜 i부터 상담을 했을 때 벌 수 있는 돈의 최댓값
-        // 날짜의 마지막 날부터 첫 날까지 거꾸로 dp 배열을 구해나간다.
-        // 예를 들어 dp[5]는 5일부터 일한 값 중 최댓값이다.
-        // dp[1]은 마지막 날의 상담을 골라서 했을 때 벌 수 있는 돈의 최댓값
-        // 그러므로 dp[1]을 구해주면 된다.
+        int[][] dp = new int[length1 + 1][length2 + 1]; // 문자열이 비교되는 위치(str1.chatAt(i)와 str2.chatAt(j))에서의 LCS 길이의 최대값을 저장
 
-        for (int i = N; i >= 1; i--) {
-            int next = i + arr[i].days;
-
-            if (next > N + 1) { // 상담할 수 있는 날짜를 넘어가는 경우
-                dp[i] = dp[i + 1]; // 그 전의 상담 가능한 일자의 돈의 최댓값을 가져옴
-            } else { // 상담할 수 있는 날짜인 경우
-                // 1. 상담하지 않았을 때(dp[i + 1])
-                // 2. 상담했을 때 총 벌 수 있는 금액(arr[i].money + dp[next])
-                // 위 두 경우 중 더 큰 값을 dp에 넣어준다.
-                dp[i] = Math.max(dp[i + 1], arr[i].money + dp[next]);
+        /*
+        경우 1: str1.chatAt(i)가 LCS에 포함되지 않는 경우
+        - str1[1 ~ i]와 str2[1 ~ j]의 LCS == str1[1 ~ i - 1]와 str2[1 ~ j]의 LCS
+        => dp[i][j] = dp[i][j - 1]
+        경우 2: str2.chatAt(j)가 LCS에 포함되지 않는 경우
+        - str1[1 ~ i]와 str2[1 ~ j]의 LCS == str1[1 ~ i]와 str2[1 ~ j - 1]의 LCS
+        => dp[i][j] = dp[i - 1][j]
+        경우 3: str1.chatAt(i), str2.chatAt(j) 모두 LCS에 포함되는 경우
+        - str1[1 ~ i]와 str2[1 ~ j]의 LCS == str1[1 ~ i - 1]와 str2[1 ~ j - 1]의 LCS + 1
+        => dp[i][j] = dp[i - 1][j - 1] + 1
+         */
+        for (int i = 1; i <= length1; i++) {
+            for (int j = 1; j <= length2; j++) {
+                if (str1.charAt(i - 1) == str2.charAt(j - 1)) { // 해당 위치의 문자가 일치하면
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else { // 해당 위치의 문자가 일치하지 않으면
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
             }
         }
 
-        return dp[1];
+        return dp[length1][length2];
     }
 
     public static void main(String[] args) throws IOException {
@@ -46,18 +40,9 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        String str1 = br.readLine();
+        String str2 = br.readLine();
 
-        arr = new Consulting[N + 1];
-
-        for (int i = 1; i <= N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int days = Integer.parseInt(st.nextToken());
-            int money = Integer.parseInt(st.nextToken());
-
-            arr[i] = new Consulting(days, money);
-        }
-
-        System.out.println(main.solution(N));
+        System.out.println(main.solution(str1, str2));
     }
 }
