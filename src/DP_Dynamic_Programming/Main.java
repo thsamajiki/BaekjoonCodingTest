@@ -21,7 +21,19 @@ public class Main {
         경우 3: str1.chatAt(i), str2.chatAt(j) 모두 LCS에 포함되는 경우
         - str1[1 ~ i]와 str2[1 ~ j]의 LCS == str1[1 ~ i - 1]와 str2[1 ~ j - 1]의 LCS + 1
         => dp[i][j] = dp[i - 1][j - 1] + 1
-         */
+        */
+
+        /* 예제 1
+
+          A C A Y K P
+        C 0 1 1 1 1 1
+        A 1 1 2 2 2 2
+        P 1 1 2 2 2 3
+        C 1 2 2 2 2 3
+        A 1 2 3 3 3 3
+        K 1 2 3 3 4 4
+
+        */
         for (int i = 1; i <= length1; i++) {
             for (int j = 1; j <= length2; j++) {
                 if (str1.charAt(i - 1) == str2.charAt(j - 1)) { // 해당 위치의 문자가 일치하면
