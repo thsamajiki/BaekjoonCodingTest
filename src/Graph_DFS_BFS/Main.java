@@ -6,84 +6,82 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static int N, M, answer;
-    static int[] dx = { -1, 0, 1,  0 };
-    static int[] dy = {  0, 1, 0, -1 };
-    static int[][] map;
+    static int N, M, R;
+    static int[][] A;
     static boolean[][] visited;
 
-    public void DFS(int x, int y, int sum, int L) {
-        if (L == 3) {
-            System.out.println("L == 3 찍다! 이제 리턴!");
-            System.out.println("sum: " + sum);
-            answer = Math.max(answer, sum);
-            System.out.println("=============");
-            return;
-        }
+    public void solution() {
+        /*
+        A[1][1] ← A[1][2] ← A[1][3] ← A[1][4] ← A[1][5]
+           ↓                                       ↑
+        A[2][1]   A[2][2] ← A[2][3] ← A[2][4]   A[2][5]
+           ↓         ↓                   ↑         ↑
+        A[3][1]   A[3][2] → A[3][3] → A[3][4]   A[3][5]
+           ↓                                       ↑
+        A[4][1] → A[4][2] → A[4][3] → A[4][4] → A[4][5]
 
-        for (int i = 0; i < 4; i++) {
-            int nextX = x + dx[i];
-            int nextY = y + dy[i];
+        temp = A[0][0] 4 + 4 + 4 + 1
+        A[0][0] = A[0][1]
+        A[0][1] = A[0][2]
+        A[0][2] = A[0][3]
+        A[0][3] = A[1][3]
+        A[1][3] = A[2][3]
+        A[2][3] = A[3][3]
+        A[3][3] = A[3][2]
+        A[3][2] = A[3][1]
+        A[3][1] = A[3][0]
+        A[3][0] = A[0][2]
+        A[0][2] = A[0][1]
+        A[0][1] = temp
 
-            if (nextX < 0 || nextX > N - 1 || nextY < 0 || nextY > M - 1) continue;
+        temp = A[1][1] 2 + 2 + 1
+        A[1][1] = A[1][2]
+        A[1][2] = A[2][2]
+        A[2][2] = A[2][1]
+        A[2][1] = temp
+        */
 
-            if (!visited[nextX][nextY]) {
+        for (int i = 0; i < R; i++) {
+            int r1 = 0, r2 = N - 1;
+            int c1 = 0, c2 = M - 1;
 
-                // ㅜ 테트로미노 만들기 위해 1번째 칸에서 탐색을 한 번 더 진행
-                if (L == 1) {
-                    System.out.println("L == 1");
-                    System.out.println("i: " + i);
-                    System.out.println("x: " + x);
-                    System.out.println("y: " + y);
-                    System.out.println("nextX: " + nextX);
-                    System.out.println("nextY: " + nextY);
-                    System.out.println("sum: " + sum);
-                    System.out.println("map[" + nextX + "][" + nextY + "]: " + map[nextX][nextY]);
-                    visited[nextX][nextY] = true;
-                    System.out.println("visited[" + x + "][" + y + "]: " + visited[x][y]);
-                    System.out.println("visited[" + nextX + "][" + nextY + "]: " + visited[nextX][nextY]);
-                    for (int j = 0; j < N; j++) {
-                        for (int k = 0; k < M; k++) {
-                            System.out.print(visited[j][k] + " ");
-                        }
-                        System.out.println();
-                    }
-                    System.out.println("============");
-                    DFS(x, y, sum + map[nextX][nextY], L + 1);
-                    visited[nextX][nextY] = false;
-                    System.out.println("visited[" + x + "][" + y + "]: " + visited[x][y]);
-                    System.out.println("visited[" + nextX + "][" + nextY + "]: " + visited[nextX][nextY]);
-                    for (int j = 0; j < N; j++) {
-                        for (int k = 0; k < M; k++) {
-                            System.out.print(visited[j][k] + " ");
-                        }
-                        System.out.println();
-                    }
+            while (r1 < r2 && c1 < c2) {
+                int temp = A[r1][c1];
+
+                // 윗변에서 왼쪽으로
+                for (int c = c1; c < c2; c++) {
+                    A[r1][c] = A[r1][c + 1];
                 }
-                System.out.println("- L == " + L);
-                System.out.println("i: " + i);
-                System.out.println("x: " + x);
-                System.out.println("y: " + y);
-                System.out.println("nextX: " + nextX);
-                System.out.println("nextY: " + nextY);
-                System.out.println("sum: " + sum);
-                System.out.println("map[" + nextX + "][" + nextY + "]: " + map[nextX][nextY]);
-                visited[nextX][nextY] = true;
-                System.out.println("visited[" + x + "][" + y + "]: " + visited[x][y]);
-                System.out.println("visited[" + nextX + "][" + nextY + "]: " + visited[nextX][nextY]);
-                for (int j = 0; j < N; j++) {
-                    for (int k = 0; k < M; k++) {
-                        System.out.print(visited[j][k] + " ");
-                    }
-                    System.out.println();
+                // 오른쪽 변에서 위쪽으로
+                for (int r = r1; r < r2; r++) {
+                    A[r][c2] = A[r + 1][c2];
                 }
-                System.out.println("============");
-                DFS(nextX, nextY, sum + map[nextX][nextY], L + 1);
-                visited[nextX][nextY] = false;
-                System.out.println("visited[" + x + "][" + y + "]: " + visited[x][y]);
-                System.out.println("visited[" + nextX + "][" + nextY + "]: " + visited[nextX][nextY]);
+                // 아랫변에서 오른쪽으로
+                for (int c = c2; c > c1; c--) {
+                    A[r2][c] = A[r2][c - 1];
+                }
+                // 왼쪽 변에서 아래쪽으로
+                for (int r = r2; r > r1; r--) {
+                    A[r][c1] = A[r - 1][c1];
+                }
+
+                A[r1 + 1][c1] = temp;
+
+                r1 += 1;
+                c1 += 1;
+                r2 -= 1;
+                c2 -= 1;
             }
         }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                sb.append(A[i][j]).append(" ");
+            }
+            sb.append("\n");
+        }
+        System.out.print(sb);
     }
 
     public static void main(String[] args) throws IOException {
@@ -93,25 +91,18 @@ public class Main {
 
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
+        R = Integer.parseInt(st.nextToken());
 
-        map = new int[N][M];
+        A = new int[N][M];
         visited = new boolean[N][M];
 
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < M; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
+                A[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                visited[i][j] = true;
-                main.DFS(i, j, map[i][j], 0);
-                visited[i][j] = false;
-            }
-        }
-
-        System.out.println(answer);
+        main.solution();
     }
 }
