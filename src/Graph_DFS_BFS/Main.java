@@ -5,83 +5,72 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
+class Point {
+    int x;
+    int y;
+
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
 public class Main {
-    static int N, M, R;
+    static int N, M, tc, diagonalWaterCount, answer;
     static int[][] A;
     static boolean[][] visited;
+    static int[] dx = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };
+    static int[] dy = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
+    static ArrayList<Point> savedCloudsXY;
 
-    public void solution() {
-        /*
-        A[1][1] ← A[1][2] ← A[1][3] ← A[1][4] ← A[1][5]
-           ↓                                       ↑
-        A[2][1]   A[2][2] ← A[2][3] ← A[2][4]   A[2][5]
-           ↓         ↓                   ↑         ↑
-        A[3][1]   A[3][2] → A[3][3] → A[3][4]   A[3][5]
-           ↓                                       ↑
-        A[4][1] → A[4][2] → A[4][3] → A[4][4] → A[4][5]
-
-        temp = A[0][0] 4 + 4 + 4 + 1
-        A[0][0] = A[0][1]
-        A[0][1] = A[0][2]
-        A[0][2] = A[0][3]
-        A[0][3] = A[1][3]
-        A[1][3] = A[2][3]
-        A[2][3] = A[3][3]
-        A[3][3] = A[3][2]
-        A[3][2] = A[3][1]
-        A[3][1] = A[3][0]
-        A[3][0] = A[0][2]
-        A[0][2] = A[0][1]
-        A[0][1] = temp
-
-        temp = A[1][1] 2 + 2 + 1
-        A[1][1] = A[1][2]
-        A[1][2] = A[2][2]
-        A[2][2] = A[2][1]
-        A[2][1] = temp
-        */
-
-        for (int i = 0; i < R; i++) {
-            int r1 = 0, r2 = N - 1;
-            int c1 = 0, c2 = M - 1;
-
-            while (r1 < r2 && c1 < c2) {
-                int temp = A[r1][c1];
-
-                // 윗변에서 왼쪽으로
-                for (int c = c1; c < c2; c++) {
-                    A[r1][c] = A[r1][c + 1];
-                }
-                // 오른쪽 변에서 위쪽으로
-                for (int r = r1; r < r2; r++) {
-                    A[r][c2] = A[r + 1][c2];
-                }
-                // 아랫변에서 오른쪽으로
-                for (int c = c2; c > c1; c--) {
-                    A[r2][c] = A[r2][c - 1];
-                }
-                // 왼쪽 변에서 아래쪽으로
-                for (int r = r2; r > r1; r--) {
-                    A[r][c1] = A[r - 1][c1];
-                }
-
-                A[r1 + 1][c1] = temp;
-
-                r1 += 1;
-                c1 += 1;
-                r2 -= 1;
-                c2 -= 1;
+    public void cloudMoves(int d, int s) {
+        for (int i = 0; i < s; i++) {
+            for (int j = 0; j < savedCloudsXY.size(); j++) {
+                savedCloudsXY.set(j, new Point((savedCloudsXY.get(j).x + dx[d] + N) % N, (savedCloudsXY.get(j).y + dy[d] + N) % N));
             }
         }
 
-        StringBuilder sb = new StringBuilder();
+        // 구름이 있는 칸에 비가 1씩 내리고,
+        for (int j = 0; j < savedCloudsXY.size(); j++) {
+            int x = savedCloudsXY.get(j).x;
+            int y = savedCloudsXY.get(j).y;
+
+            A[x][y]++;
+        }
+
+        for (int j = 0; j < savedCloudsXY.size(); j++) {
+            diagonalWaterCount = 0;
+            checkDiagonalWater(savedCloudsXY.get(j).x, savedCloudsXY.get(j).y);
+        }
+    }
+
+    public void checkDiagonalWater(int x, int y) {
+        for (int d = 2; d <= 8; d += 2) {
+            int nextX = x + dx[d];
+            int nextY = y + dy[d];
+
+            if (nextX < 0 || nextX > N - 1 || nextY < 0 || nextY > N - 1) continue;
+
+            if (A[nextX][nextY] != 0) {
+                diagonalWaterCount++;
+            }
+
+        }
+        visited[x][y] = true;
+        A[x][y] += diagonalWaterCount;
+    }
+
+    public void createClouds() {
+        savedCloudsXY = new ArrayList<>();
+
         for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                sb.append(A[i][j]).append(" ");
+            for (int j = 0; j < N; j++) {
+                if (A[i][j] >= 2 && !visited[i][j]) {
+                    savedCloudsXY.add(new Point(i, j));
+                    A[i][j] -= 2;
+                }
             }
-            sb.append("\n");
         }
-        System.out.print(sb);
     }
 
     public static void main(String[] args) throws IOException {
@@ -91,18 +80,38 @@ public class Main {
 
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-        R = Integer.parseInt(st.nextToken());
 
-        A = new int[N][M];
-        visited = new boolean[N][M];
+        A = new int[N][N];
+        visited = new boolean[N][N];
 
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < M; j++) {
+            for (int j = 0; j < N; j++) {
                 A[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        main.solution();
+        savedCloudsXY = new ArrayList<>();
+        savedCloudsXY.add(new Point(N - 2, 0));
+        savedCloudsXY.add(new Point(N - 2, 1));
+        savedCloudsXY.add(new Point(N - 1, 0));
+        savedCloudsXY.add(new Point(N - 1, 1));
+
+        for (tc = 0; tc < M; tc++) {
+            st = new StringTokenizer(br.readLine());
+            int d = Integer.parseInt(st.nextToken());
+            int s = Integer.parseInt(st.nextToken());
+            main.cloudMoves(d, s);
+            main.createClouds();
+            visited = new boolean[N][N];
+        }
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                answer += A[i][j];
+            }
+        }
+
+        System.out.println(answer);
     }
 }
