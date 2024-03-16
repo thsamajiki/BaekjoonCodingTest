@@ -3,115 +3,61 @@ package Graph_DFS_BFS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.PriorityQueue;
 
-class Point {
-    int x;
-    int y;
+class AbsNumber implements Comparable<AbsNumber> {
+    int num;
 
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public AbsNumber(int num) {
+        this.num = num;
+    }
+
+    @Override
+    public int compareTo(AbsNumber o2) {
+        if (Math.abs(this.num) > Math.abs(o2.num)) {
+            return Math.abs(this.num) - Math.abs(o2.num);
+        } else if (Math.abs(this.num) == Math.abs(o2.num)) {
+            return this.num - o2.num;
+        } else {
+            return -1; // 무조건 -1을 주어야 하는 것이 아니고 음수이면 가능
+        }
     }
 }
 
 public class Main {
-    static int N, M, tc, diagonalWaterCount, answer;
-    static int[][] A;
-    static boolean[][] visited;
-    static int[] dx = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };
-    static int[] dy = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
-    static ArrayList<Point> savedCloudsXY;
+    public String solution(int[] arr) {
+        PriorityQueue<AbsNumber> pq = new PriorityQueue<>();
 
-    public void cloudMoves(int d, int s) {
-        for (int i = 0; i < s; i++) {
-            for (int j = 0; j < savedCloudsXY.size(); j++) {
-                savedCloudsXY.set(j, new Point((savedCloudsXY.get(j).x + dx[d] + N) % N, (savedCloudsXY.get(j).y + dy[d] + N) % N));
-            }
-        }
-
-        // 구름이 있는 칸에 비가 1씩 내리고,
-        for (int j = 0; j < savedCloudsXY.size(); j++) {
-            int x = savedCloudsXY.get(j).x;
-            int y = savedCloudsXY.get(j).y;
-
-            A[x][y]++;
-        }
-
-        for (int j = 0; j < savedCloudsXY.size(); j++) {
-            diagonalWaterCount = 0;
-            checkDiagonalWater(savedCloudsXY.get(j).x, savedCloudsXY.get(j).y);
-        }
-    }
-
-    public void checkDiagonalWater(int x, int y) {
-        for (int d = 2; d <= 8; d += 2) {
-            int nextX = x + dx[d];
-            int nextY = y + dy[d];
-
-            if (nextX < 0 || nextX > N - 1 || nextY < 0 || nextY > N - 1) continue;
-
-            if (A[nextX][nextY] != 0) {
-                diagonalWaterCount++;
-            }
-
-        }
-        visited[x][y] = true;
-        A[x][y] += diagonalWaterCount;
-    }
-
-    public void createClouds() {
-        savedCloudsXY = new ArrayList<>();
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (A[i][j] >= 2 && !visited[i][j]) {
-                    savedCloudsXY.add(new Point(i, j));
-                    A[i][j] -= 2;
+        StringBuilder sb = new StringBuilder();
+        for(int num: arr) {
+            if (num != 0) {
+                pq.offer(new AbsNumber(num));
+            } else {
+                if (pq.isEmpty()) {
+                    sb.append(0).append("\n");
+                } else {
+                    sb.append(pq.poll().num).append("\n");
                 }
             }
         }
+
+        return sb.toString();
     }
 
     public static void main(String[] args) throws IOException {
         Main main = new Main();
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
+        int N = Integer.parseInt(br.readLine());
 
-        A = new int[N][N];
-        visited = new boolean[N][N];
+        int[] arr = new int[N];
 
-        for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < N; j++) {
-                A[i][j] = Integer.parseInt(st.nextToken());
-            }
+        for(int i = 0; i < N; i++) {
+            int x = Integer.parseInt(br.readLine());
+            arr[i] = x;
         }
 
-        savedCloudsXY = new ArrayList<>();
-        savedCloudsXY.add(new Point(N - 2, 0));
-        savedCloudsXY.add(new Point(N - 2, 1));
-        savedCloudsXY.add(new Point(N - 1, 0));
-        savedCloudsXY.add(new Point(N - 1, 1));
-
-        for (tc = 0; tc < M; tc++) {
-            st = new StringTokenizer(br.readLine());
-            int d = Integer.parseInt(st.nextToken());
-            int s = Integer.parseInt(st.nextToken());
-            main.cloudMoves(d, s);
-            main.createClouds();
-            visited = new boolean[N][N];
-        }
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                answer += A[i][j];
-            }
-        }
-
-        System.out.println(answer);
+        System.out.println(main.solution(arr));
     }
 }
