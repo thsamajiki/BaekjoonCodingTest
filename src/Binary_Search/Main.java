@@ -3,44 +3,44 @@ package Binary_Search;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int N;
-    public int solution(int[] requestArr, int M) {
-        int left = 0;
-        int right = Arrays.stream(requestArr).max().getAsInt();
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        while (left <= right) {
-            int mid = (left + right) / 2; // 상한액
-            long budget = 0; // 상한액(mid)으로 얻을 수 있는 예산
+        int K = Integer.parseInt(st.nextToken()); // 이미 가지고 있는 랜선의 개수
+        int N = Integer.parseInt(st.nextToken()); // 필요한 랜선의 개수
 
-            for (int i = 0; i < N; i++) {
-                if (requestArr[i] > mid) budget += mid;
-                else budget += requestArr[i];
+        long[] lans = new long[K];
+
+        long min = 1; // 가장 짧은 랜선의 길이
+        long max = 0; // 가장 긴 랜선의 길이
+
+        for (int i = 0; i < K; i++) {
+            lans[i] = Integer.parseInt(br.readLine()); // 이미 가지고 있는 각 랜선의 길이
+            max = Math.max(max, lans[i]);
+        }
+
+        while (min <= max) {
+            long totalCount = 0;
+            long mid = (min + max) / 2;
+
+            for (int i = 0; i < K; i++) {
+                totalCount += lans[i] / mid;
             }
 
-            if (budget <= M) left = mid + 1;
-            else right = mid - 1;
+            // mid 길이로 잘랐을 때의 개수가 만들고자 하는 랜선의 개수보다 작다면
+            // 자르고자 하는 길이를 줄이기 위해 최대 길이를 줄인다.
+            // 그 외에는 자르고자 하는 길이를 늘려야 하므로 최소 길이를 늘린다.
+            if (totalCount >= N) {
+                min = mid + 1;
+            } else {
+                max = mid - 1;
+            }
         }
 
-        return right;
-    }
-    public static void main(String[] args) throws IOException {
-        Main main = new Main();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        N = Integer.parseInt(br.readLine());
-
-        int[] requestArr = new int[N];
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < N; i++) {
-            requestArr[i] = Integer.parseInt(st.nextToken());
-        }
-
-        int M = Integer.parseInt(br.readLine());
-
-        System.out.println(main.solution(requestArr, M));
+        System.out.println(max);
     }
 }
