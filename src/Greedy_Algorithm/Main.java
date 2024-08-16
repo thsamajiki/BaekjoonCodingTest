@@ -1,41 +1,50 @@
 package Greedy_Algorithm;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.*;
+import java.io.*;
 
 public class Main {
-    public int solution(String str) {
-        int answer = Integer.MAX_VALUE;
+    static class Conference {
+        int startTime;
+        int endTime;
 
-        String[] subtraction = str.split("-");
-
-        for (int i = 0; i < subtraction.length; i++) {
-            int temp = 0;
-
-            String[] addition = subtraction[i].split("[+]");
-
-            for (int j = 0; j < addition.length; j++) {
-                temp += Integer.parseInt(addition[j]);
-            }
-
-            if (answer == Integer.MAX_VALUE) {
-                answer = temp;
-            } else {
-                answer -= temp;
-            }
+        public Conference(int startTime, int endTime) {
+            this.startTime = startTime;
+            this.endTime = endTime;
         }
-
-        return answer;
     }
 
     public static void main(String[] args) throws IOException {
-        Main main = new Main();
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String str = br.readLine();
+        int N = Integer.parseInt(br.readLine());
 
-        System.out.println(main.solution(str));
+        Conference[] conferenceTimes = new Conference[N];
+
+        for(int i = 0; i < N; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            conferenceTimes[i] = new Conference(0, 0);
+            conferenceTimes[i].startTime = Integer.parseInt(st.nextToken());
+            conferenceTimes[i].endTime = Integer.parseInt(st.nextToken());
+        }
+
+        Arrays.sort(conferenceTimes, (o1, o2) -> {
+            if (o1.endTime == o2.endTime) {
+                return o1.startTime - o2.startTime;
+            }
+
+            return o1.endTime - o2.endTime;
+        });
+
+        int count = 0;
+        int prevEndTime = 0;
+        for(int i = 0; i < N; i++) {
+            if(prevEndTime <= conferenceTimes[i].startTime) {
+                prevEndTime = conferenceTimes[i].endTime;
+                count++;
+            }
+        }
+
+        System.out.println(count);
     }
 }
